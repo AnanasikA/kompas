@@ -27,7 +27,7 @@ const button = (name, opts = {}) => page.getByRole("button", { name, ...opts });
 
 // 1. Landing
 await page.goto(BASE);
-check("1. landing renders", await text("Angielski, który dzieje się naprawdę.").isVisible());
+check("1. landing renders", await page.getByRole("heading", { level: 1, name: "Angielski, którego naprawdę użyjesz." }).isVisible());
 await shot("01-landing");
 await page.getByRole("link", { name: "Zacznij naukę" }).first().click();
 
