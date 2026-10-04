@@ -1,0 +1,282 @@
+@import "tailwindcss";
+
+/*
+ * KOMPAS design tokens.
+ * Values are taken 1:1 from the design prototype (Kompas Prototype.dc.html).
+ * Three presentation layers share one token file:
+ *   common + CHILD ("Explorer")  → warm paper, ink, amber, chunky shadows
+ *   TEEN ("Player")              → night surfaces, lime + grape accents
+ *   ADULT ("Navigator")          → calm canvas, serif display, azure accent
+ */
+@theme {
+  /* Typography */
+  --font-display: "Bricolage Grotesque Variable", "Bricolage Grotesque", system-ui, sans-serif;
+  --font-sans: "Instrument Sans Variable", "Instrument Sans", system-ui, sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-mono: "DM Mono", ui-monospace, monospace;
+
+  /* Ink + paper (common / child) */
+  --color-ink: oklch(0.23 0.025 265);
+  --color-ink-hover: oklch(0.32 0.03 265);
+  --color-ink-soft: oklch(0.28 0.03 265);
+  --color-ink-raised: oklch(0.27 0.03 265);
+  --color-ink-line: oklch(0.36 0.03 265);
+  --color-ink-deep: oklch(0.12 0.02 265);
+  --color-on-ink: oklch(0.975 0.008 85);
+  --color-on-ink-muted: oklch(0.82 0.012 265);
+  --color-paper: oklch(0.975 0.008 85);
+  --color-sand: oklch(0.945 0.012 85);
+  --color-card: oklch(0.995 0.004 85);
+  --color-track: oklch(0.93 0.01 85);
+  --color-idle: oklch(0.9 0.01 85);
+  --color-line: oklch(0.88 0.015 85);
+  --color-line-soft: oklch(0.9 0.012 85);
+  --color-line-strong: oklch(0.85 0.02 85);
+  --color-muted: oklch(0.45 0.02 265);
+  --color-body: oklch(0.4 0.02 265);
+  --color-faint: oklch(0.5 0.02 265);
+
+  /* Child accents */
+  --color-amber: oklch(0.8 0.15 75);
+  --color-amber-mid: oklch(0.86 0.12 80);
+  --color-amber-soft: oklch(0.94 0.06 80);
+  --color-amber-deep: oklch(0.62 0.13 65);
+  --color-amber-deeper: oklch(0.46 0.11 60);
+  --color-amber-ink: oklch(0.4 0.1 60);
+  --color-amber-body: oklch(0.33 0.07 60);
+  --color-moss: oklch(0.74 0.15 145);
+  --color-moss-soft: oklch(0.93 0.06 145);
+  --color-moss-deep: oklch(0.52 0.12 145);
+  --color-moss-deeper: oklch(0.38 0.1 145);
+  --color-moss-ink: oklch(0.32 0.09 145);
+  --color-coral: oklch(0.74 0.15 35);
+  --color-coral-soft: oklch(0.94 0.05 35);
+  --color-coral-deep: oklch(0.55 0.15 35);
+  --color-coral-ink: oklch(0.48 0.13 35);
+  --color-sky: oklch(0.74 0.15 225);
+  --color-sky-soft: oklch(0.93 0.05 225);
+  --color-sky-deep: oklch(0.52 0.12 235);
+  --color-sky-deeper: oklch(0.4 0.1 235);
+  --color-sky-ink: oklch(0.32 0.08 235);
+  --color-violet: oklch(0.74 0.15 305);
+  --color-violet-soft: oklch(0.93 0.04 305);
+  --color-violet-deep: oklch(0.52 0.14 305);
+
+  /* Teen */
+  --color-night: oklch(0.17 0.02 275);
+  --color-night-deep: oklch(0.14 0.015 275);
+  --color-night-surface: oklch(0.21 0.025 275);
+  --color-night-raised: oklch(0.26 0.03 275);
+  --color-night-chip: oklch(0.3 0.03 275);
+  --color-night-line: oklch(0.32 0.03 275);
+  --color-night-line-soft: oklch(0.28 0.025 275);
+  --color-night-text: oklch(0.95 0.01 275);
+  --color-night-body: oklch(0.8 0.015 275);
+  --color-night-muted: oklch(0.72 0.02 275);
+  --color-lime: oklch(0.88 0.17 125);
+  --color-lime-hover: oklch(0.93 0.15 125);
+  --color-grape: oklch(0.72 0.15 295);
+  --color-grape-text: oklch(0.8 0.12 295);
+
+  /* Adult */
+  --color-canvas: oklch(0.97 0.006 90);
+  --color-canvas-card: oklch(0.99 0.003 90);
+  --color-canvas-line: oklch(0.88 0.01 90);
+  --color-canvas-line-soft: oklch(0.9 0.01 90);
+  --color-canvas-line-strong: oklch(0.85 0.01 90);
+  --color-azure: oklch(0.42 0.09 225);
+  --color-azure-soft: oklch(0.95 0.02 225);
+  --color-azure-ink: oklch(0.35 0.03 245);
+  --color-ochre: oklch(0.62 0.13 65);
+  --color-ochre-soft: oklch(0.96 0.03 80);
+  --color-ochre-ink: oklch(0.55 0.12 60);
+
+  /* Motion */
+  --animate-kpulse: kpulse 1.8s ease-out infinite;
+  --animate-kpop: kpop 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+  --animate-kfade: kfade 0.3s both;
+  --animate-kslide: kslide 0.35s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  --animate-kfloat: kfloat 3.2s ease-in-out infinite;
+
+  @keyframes kpulse {
+    0% { transform: scale(1); opacity: 0.55; }
+    100% { transform: scale(1.9); opacity: 0; }
+  }
+  @keyframes kpop {
+    0% { transform: scale(0.4) translateY(10px); opacity: 0; }
+    60% { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes kbar {
+    0%, 100% { transform: scaleY(0.25); }
+    50% { transform: scaleY(1); }
+  }
+  @keyframes kfloat {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-10px) rotate(2deg); }
+  }
+  @keyframes kslide {
+    0% { transform: translateY(100%); }
+    100% { transform: translateY(0); }
+  }
+  @keyframes kfade {
+    0% { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: none; }
+  }
+}
+
+/* Age-scoped variants: `child:`, `teen:`, `adult:` apply inside [data-age=…]. */
+@custom-variant child (&:where([data-age="CHILD"], [data-age="CHILD"] *));
+@custom-variant teen (&:where([data-age="TEEN"], [data-age="TEEN"] *));
+@custom-variant adult (&:where([data-age="ADULT"], [data-age="ADULT"] *));
+
+/*
+ * Semantic surface tokens. Screens that look the same in every age mode
+ * (settings, progress) read these instead of branching on age.
+ */
+:root,
+[data-age="CHILD"] {
+  --k-bg: var(--color-paper);
+  --k-surface: var(--color-card);
+  --k-surface-2: var(--color-sand);
+  --k-text: var(--color-ink);
+  --k-muted: var(--color-muted);
+  --k-line: var(--color-line);
+  --k-accent: var(--color-amber);
+  --k-on-accent: var(--color-ink);
+  --k-focus: var(--color-ink);
+  --k-radius: 28px;
+  --k-heading: var(--font-display);
+  --k-heading-weight: 800;
+  --k-heading-tracking: -0.035em;
+}
+[data-age="TEEN"] {
+  --k-bg: var(--color-night);
+  --k-surface: var(--color-night-surface);
+  --k-surface-2: var(--color-night-raised);
+  --k-text: var(--color-night-text);
+  --k-muted: var(--color-night-muted);
+  --k-line: var(--color-night-line);
+  --k-accent: var(--color-lime);
+  --k-on-accent: var(--color-night);
+  --k-focus: var(--color-lime);
+  --k-radius: 12px;
+  --k-heading: var(--font-display);
+  --k-heading-weight: 800;
+  --k-heading-tracking: -0.035em;
+}
+[data-age="ADULT"] {
+  --k-bg: var(--color-canvas);
+  --k-surface: var(--color-canvas-card);
+  --k-surface-2: var(--color-azure-soft);
+  --k-text: var(--color-ink);
+  --k-muted: var(--color-muted);
+  --k-line: var(--color-canvas-line);
+  --k-accent: var(--color-ink);
+  --k-on-accent: var(--color-canvas);
+  --k-focus: var(--color-azure);
+  --k-radius: 8px;
+  --k-heading: var(--font-serif);
+  --k-heading-weight: 400;
+  --k-heading-tracking: -0.01em;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+[data-age] {
+  background: var(--k-bg);
+  color: var(--k-text);
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* One visible focus treatment everywhere; colour follows the active age mode. */
+:focus-visible {
+  outline: 3px solid var(--k-focus);
+  outline-offset: 3px;
+}
+
+/* On dark panels inside light screens the ink outline would disappear. */
+.bg-ink :focus-visible,
+.bg-ink-raised :focus-visible,
+.k-on-dark :focus-visible {
+  outline-color: var(--color-amber);
+}
+
+.k-heading {
+  font-family: var(--k-heading);
+  font-weight: var(--k-heading-weight);
+  letter-spacing: var(--k-heading-tracking);
+}
+
+/* Recording bars: each bar gets its own duration/delay inline. */
+.k-bar {
+  transform-origin: center;
+  animation-name: kbar;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.k-shrink {
+  animation: kshrink linear both;
+}
+@keyframes kshrink {
+  0% { width: 100%; }
+  100% { width: 0%; }
+}
+
+/*
+ * Text links stay as small as the design draws them, but get a finger-sized
+ * hit area on touch screens (about 44px tall).
+ */
+.k-tap {
+  position: relative;
+}
+.k-tap::after {
+  content: "";
+  position: absolute;
+  inset: -12px -10px;
+}
+
+.sr-only-focusable:not(:focus):not(:focus-within) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
