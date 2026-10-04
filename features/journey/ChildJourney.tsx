@@ -178,7 +178,7 @@ function Island({
           <>
             <svg aria-hidden className="pointer-events-none absolute inset-0" width={width} height={height}>
               <polyline points={line(0, points.length - 1)} fill="none" stroke="oklch(0.23 0.025 265 / 0.28)" strokeWidth="5" strokeDasharray="2 13" strokeLinecap="round" strokeLinejoin="round" />
-              {reached > from && <polyline points={line(from, reached)} fill="none" stroke="oklch(0.23 0.025 265)" strokeWidth="6" strokeDasharray="2 13" strokeLinecap="round" strokeLinejoin="round" />}
+              {reached > from && <polyline points={line(from, reached)} fill="none" stroke="var(--color-ink)" strokeWidth="6" strokeDasharray="2 13" strokeLinecap="round" strokeLinejoin="round" />}
             </svg>
             <ol className="m-0 list-none p-0">
               {state.lessons.map((l, i) => {

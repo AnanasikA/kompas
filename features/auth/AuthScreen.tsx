@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { ArrowRight, Briefcase, Check, Map as MapIcon, Target, type LucideIcon } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { useAppStore } from "@/lib/store/app-store";
 import { cx } from "@/lib/utils";
@@ -17,11 +18,11 @@ const FAILURE: Record<AuthFailure, string> = {
   WRONG_PASSWORD: "Hasło się nie zgadza. Spróbuj jeszcze raz.",
 };
 
-/** The little shape that stands for each age mode across the product. */
-const DEMO_MARK: Record<DemoAccount["ageGroup"], string> = {
-  CHILD: "rounded-full bg-amber",
-  TEEN: "rotate-45 bg-night shadow-[0_0_0_2px_var(--color-lime)]",
-  ADULT: "rounded-[2px] border-[1.5px] border-azure",
+/** One line icon per age mode, the same ones the landing page uses. */
+const DEMO_ICON: Record<DemoAccount["ageGroup"], LucideIcon> = {
+  CHILD: MapIcon,
+  TEEN: Target,
+  ADULT: Briefcase,
 };
 
 /**
@@ -76,13 +77,13 @@ export function AuthScreen() {
         <div className="mt-auto hidden flex-col gap-2.5 sm:flex" aria-hidden>
           <span className="self-start rounded-[16px_16px_16px_4px] bg-amber px-3.5 py-[9px] text-[15px] font-semibold text-ink">I&apos;d like a coffee, please.</span>
           <span className="ml-10 self-start rounded-lg bg-grape px-3.5 py-[9px] text-[15px] font-semibold text-night">Which gate is it now?</span>
-          <span className="ml-20 self-start rounded-full px-3.5 py-[9px] font-serif text-lg shadow-[inset_0_0_0_1px_oklch(0.55_0.03_265)]">Could we move the meeting?</span>
+          <span className="ml-20 self-start rounded-full px-3.5 py-[9px] font-serif text-lg shadow-[inset_0_0_0_1px_oklch(0.55_0.008_265)]">Could we move the meeting?</span>
         </div>
-        <p className="m-0 mt-auto max-w-[12ch] font-display text-[clamp(38px,4.5vw,62px)] font-extrabold leading-[0.98] tracking-[-0.035em] sm:mt-0">
-          Twój angielski. Twój sposób nauki.
+        <p className="m-0 mt-auto max-w-[20ch] text-balance font-display text-[clamp(38px,4.5vw,62px)] font-extrabold leading-[0.98] tracking-[-0.035em] sm:mt-0">
+          Znajdź swój kierunek w angielskim.
         </p>
-        <p className="m-0 max-w-[38ch] text-base leading-normal text-[oklch(0.85_0.012_265)]">
-          Załóż konto, a dopasujemy poziom, tempo i sposób nauki do Ciebie.
+        <p className="m-0 max-w-[54ch] text-pretty text-base leading-normal text-on-ink-muted">
+          Dopasujemy naukę do Twojego poziomu, wieku i tempa.
         </p>
       </div>
 
@@ -184,7 +185,7 @@ export function AuthScreen() {
                     consent ? "bg-ink text-on-ink" : "shadow-[inset_0_0_0_2px_var(--color-line-strong)]",
                   )}
                 >
-                  {consent ? "✓" : ""}
+                  {consent && <Check size={14} strokeWidth={3} />}
                 </span>
                 Akceptuję regulamin. Jeśli zakładam konto dla dziecka, jestem jego rodzicem lub opiekunem.
               </label>
@@ -220,26 +221,29 @@ export function AuthScreen() {
               </p>
             </div>
             <ul className="m-0 flex list-none flex-col gap-2 p-0">
-              {demos.map((demo) => (
-                <li key={demo.id}>
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={() => void enter("login", { email: demo.email, password: DEMO_PASSWORD })}
-                    className="flex w-full items-center gap-3 rounded-xl bg-card px-3.5 py-3 text-left shadow-[inset_0_0_0_1.5px_var(--color-line)] hover:shadow-[inset_0_0_0_1.5px_var(--color-ink)]"
-                  >
-                    <span aria-hidden className={cx("size-3 shrink-0", DEMO_MARK[demo.ageGroup])} />
-                    <span className="flex min-w-0 flex-1 flex-col">
-                      <span className="text-[15px] font-semibold">
-                        {demo.label} {demo.range} · {demo.name}
+              {demos.map((demo) => {
+                const Icon = DEMO_ICON[demo.ageGroup];
+                return (
+                  <li key={demo.id}>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => void enter("login", { email: demo.email, password: DEMO_PASSWORD })}
+                      className="flex w-full items-center gap-3 rounded-xl bg-card px-3.5 py-3 text-left shadow-[inset_0_0_0_1.5px_var(--color-line)] hover:shadow-[inset_0_0_0_1.5px_var(--color-ink)]"
+                    >
+                      <Icon aria-hidden size={20} strokeWidth={1.8} className="shrink-0" />
+                      <span className="flex min-w-0 flex-1 flex-col">
+                        <span className="text-[15px] font-semibold">
+                          {demo.label} {demo.range} · {demo.name}
+                        </span>
+                        <span className="truncate font-mono text-xs text-muted">{demo.email}</span>
                       </span>
-                      <span className="truncate font-mono text-xs text-muted">{demo.email}</span>
-                    </span>
-                    <span className="font-mono text-xs text-muted">{demo.level}</span>
-                    <span aria-hidden className="text-lg">→</span>
-                  </button>
-                </li>
-              ))}
+                      <span className="font-mono text-xs text-muted">{demo.level}</span>
+                      <ArrowRight aria-hidden size={18} strokeWidth={2} className="shrink-0" />
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           </section>
         )}

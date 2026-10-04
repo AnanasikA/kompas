@@ -21,14 +21,15 @@
   --font-mono: "DM Mono", ui-monospace, monospace;
 
   /* Ink + paper (common / child) */
-  --color-ink: oklch(0.23 0.025 265);
-  --color-ink-hover: oklch(0.32 0.03 265);
-  --color-ink-soft: oklch(0.28 0.03 265);
-  --color-ink-raised: oklch(0.27 0.03 265);
-  --color-ink-line: oklch(0.36 0.03 265);
-  --color-ink-deep: oklch(0.12 0.02 265);
+  /* The dark is a neutral near-black (it used to lean navy: chroma 0.025–0.03 at hue 265). */
+  --color-ink: oklch(0.21 0.006 265);
+  --color-ink-hover: oklch(0.3 0.008 265);
+  --color-ink-soft: oklch(0.27 0.008 265);
+  --color-ink-raised: oklch(0.26 0.008 265);
+  --color-ink-line: oklch(0.36 0.008 265);
+  --color-ink-deep: oklch(0.11 0.005 265);
   --color-on-ink: oklch(0.975 0.008 85);
-  --color-on-ink-muted: oklch(0.82 0.012 265);
+  --color-on-ink-muted: oklch(0.82 0.006 265);
   --color-paper: oklch(0.975 0.008 85);
   --color-sand: oklch(0.945 0.012 85);
   --color-card: oklch(0.995 0.004 85);

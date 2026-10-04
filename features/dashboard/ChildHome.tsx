@@ -140,7 +140,7 @@ export function ChildHome() {
             <span className="absolute bottom-[210px] right-[6%] size-[30px] rounded-full bg-[oklch(0.62_0.15_145)]" />
             <span className="absolute bottom-[196px] h-[18px] w-1.5 bg-[oklch(0.45_0.06_60)]" style={{ right: "calc(6% + 12px)" }} />
             <svg className="absolute inset-0 h-full w-full" viewBox="0 0 500 400" preserveAspectRatio="none">
-              <polyline points="30,370 110,330 190,350 270,300 350,330 420,290" fill="none" stroke="oklch(0.23 0.025 265)" strokeWidth="4" strokeDasharray="2 11" strokeLinecap="round" />
+              <polyline points="30,370 110,330 190,350 270,300 350,330 420,290" fill="none" stroke="var(--color-ink)" strokeWidth="4" strokeDasharray="2 11" strokeLinecap="round" />
             </svg>
             {[
               ["6%", "20px"],
