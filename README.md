@@ -38,6 +38,31 @@ Definicje są w `data/demo/accounts.ts`; przed publicznym startem ustaw tam `DEM
 Własne konta zakłada się normalnie przez „Załóż konto” (przechodzą cały onboarding). Na jednym
 urządzeniu może być dowolnie wiele kont obok siebie.
 
+### Wdrożenie na Vercel
+
+Projekt nie wymaga żadnej konfiguracji ani zmiennych środowiskowych.
+
+1. Wyślij repozytorium na GitHub (`git remote add origin … && git push -u origin main`).
+2. Na vercel.com: **Add New → Project → Import** tego repozytorium → **Deploy**
+   (Vercel sam rozpozna Next.js; polecenie budowania to `next build`).
+3. Każdy kolejny `git push` na `main` wdraża nową wersję; inne gałęzie dostają adres podglądu.
+
+Na wdrożonej wersji działają te same konta testowe. Dane nadal zapisują się w przeglądarce
+urządzenia (telefon i komputer mają osobny postęp) — wspólne konta to Etap 1 w `ROADMAP.md`.
+Strona ma `noindex` (`app/layout.tsx`), żeby wersja pokazowa nie trafiła do Google.
+
+### Wersja pokazowa: instalacja, uwagi, statystyki
+
+- **Instalacja na telefonie:** `app/manifest.ts` + ikony w `public/icons`. Android/Chrome: menu →
+  „Zainstaluj aplikację”; iPhone/Safari: Udostępnij → „Do ekranu początkowego”.
+  Aplikacja nie działa jeszcze bez internetu (to Etap 05).
+- **Zakładka „UWAGI”** (`components/FeedbackTab.tsx`) jest na każdym ekranie. Tester wpisuje uwagę
+  i wysyła ją przez udostępnianie w telefonie (Messenger, WhatsApp, SMS) albo kopiuje; do treści
+  dołącza się ekran, tryb i urządzenie. Ustawienia w `data/site.ts` (wyłączenie, opcjonalny e-mail).
+- **Statystyki odwiedzin:** `@vercel/analytics`, działa tylko na Vercelu i dopiero po kliknięciu
+  **Enable** w zakładce Analytics projektu. Bez ciasteczek; pokazuje liczbę odwiedzin, strony,
+  kraj i urządzenie — nie konkretne osoby.
+
 ### Polecenia
 
 | Polecenie | Co robi |

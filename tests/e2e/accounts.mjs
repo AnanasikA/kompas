@@ -119,6 +119,30 @@ await page.goto(`${BASE}/auth?mode=login`);
 await page.waitForLoadState("networkidle"); // a screenshot before hydration would alter the inputs
 await page.screenshot({ path: `${OUT}/acc-login.png`, fullPage: true });
 
+// 6. Test build extras: installable app and the feedback tab.
+const manifest = await (await page.request.get(`${BASE}/manifest.webmanifest`)).json();
+check("manifest: installable (name, standalone, 192 + 512 icons)", manifest.short_name === "Kompas" && manifest.display === "standalone" && manifest.icons.length === 3);
+for (const icon of manifest.icons) check(`manifest: ${icon.src} is served`, (await page.request.get(`${BASE}${icon.src}`)).status() === 200);
+await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+await page.goto(`${BASE}/auth?mode=login`);
+await page.waitForLoadState("networkidle");
+await page.evaluate(() => delete Navigator.prototype.share); // desktop path: copy instead of share
+await btn("UWAGI").click();
+check("feedback: cannot send an empty note", await btn("Wyślij uwagę").isDisabled());
+await page.getByLabel("Twoja uwaga").fill("Przycisk jest za mały");
+await btn("Wyślij uwagę").click();
+await page.getByText("Skopiowano.").waitFor();
+const copied = await page.evaluate(() => navigator.clipboard.readText());
+check("feedback: the note is copied with the screen it was written on", copied.includes("Przycisk jest za mały") && copied.includes("ekran: /auth"), copied.slice(0, 80).replace(/\n/g, " "));
+await btn("Zamknij").click();
+check("feedback: the tab stays out of the way on a phone", await (async () => {
+  await p2.goto(`${BASE}/auth?mode=login`);
+  await p2.waitForLoadState("networkidle");
+  const box = await p2.getByRole("button", { name: "UWAGI" }).boundingBox();
+  const fits = await p2.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1);
+  return fits && !!box && box.width <= 28 && box.x + box.width <= 391;
+})());
+
 check("no console errors", errors.length === 0, errors.slice(0, 3).join(" | "));
 await browser.close();
 console.log(problems.length ? `\n${problems.length} problem(s)` : "\nAccounts: all checks passed");
