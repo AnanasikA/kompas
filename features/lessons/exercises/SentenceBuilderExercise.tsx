@@ -1,5 +1,6 @@
 "use client";
 
+import { UndoGlyph } from "@/components/ui/icons";
 import { useState } from "react";
 import { evaluateSentence } from "@/features/learning/engine/evaluate";
 import { xpForExercise } from "@/features/learning/engine/xp";
@@ -122,7 +123,8 @@ export function SentenceBuilderExercise({ exercise, onMistake, onSolved, onConti
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex gap-1">
             <button type="button" onClick={() => setPlaced((p) => p.slice(0, -1))} disabled={placed.length === 0} className={cx(skin.ghost, "disabled:opacity-40")}>
-              {age === "CHILD" ? "↶ Cofnij" : "↶ Undo"}
+              <UndoGlyph />
+              {age === "CHILD" ? "Cofnij" : "Undo"}
             </button>
             <button type="button" onClick={reset} disabled={placed.length === 0} className={cx(skin.ghost, "disabled:opacity-40")}>
               {age === "CHILD" ? "Wyczyść" : "Reset"}

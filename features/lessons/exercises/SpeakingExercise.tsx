@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { RichText } from "@/components/ui/RichText";
-import { MicIcon, RecordingBars } from "@/components/ui/icons";
+import { MicIcon, PlayGlyph, RecordingBars } from "@/components/ui/icons";
 import { evaluateSpeech, type SpeechEvaluation } from "@/features/learning/engine/evaluate";
 import { xpForExercise } from "@/features/learning/engine/xp";
 import { useAge } from "@/features/theme/AgeScope";
@@ -20,7 +20,7 @@ const subscribeNever = () => () => {};
 
 const COPY: Record<AgeGroup, Record<string, string>> = {
   CHILD: {
-    model: "▶ wzór",
+    model: "wzór",
     tap: "Naciśnij i mów",
     listening: "Słucham…",
     stop: "Zatrzymaj",
@@ -36,7 +36,7 @@ const COPY: Record<AgeGroup, Record<string, string>> = {
     confirmed: "Zapisane! Tym razem nie sprawdzaliśmy nagrania.",
   },
   TEEN: {
-    model: "▶ MODEL",
+    model: "MODEL",
     tap: "TAP TO RECORD",
     listening: "LISTENING…",
     stop: "Stop",
@@ -52,7 +52,7 @@ const COPY: Record<AgeGroup, Record<string, string>> = {
     confirmed: "Saved. This one wasn't checked.",
   },
   ADULT: {
-    model: "▶ LISTEN",
+    model: "LISTEN",
     tap: "Naciśnij i mów",
     listening: "Słucham…",
     stop: "Stop",
@@ -152,7 +152,14 @@ export function SpeakingExercise({ exercise, onSolved, onContinue, showXp }: Exe
             age === "ADULT" && "rounded-full px-3 py-2 text-[11px] shadow-[inset_0_0_0_1px_oklch(0.70_0.05_225)]",
           )}
         >
-          {model.status === "playing" ? "…" : t.model}
+          {model.status === "playing" ? (
+            "…"
+          ) : (
+            <>
+              <PlayGlyph />
+              {t.model}
+            </>
+          )}
         </button>
       </div>
       {exercise.translation && (
@@ -170,7 +177,7 @@ export function SpeakingExercise({ exercise, onSolved, onContinue, showXp }: Exe
       {phase === "idle" && canRecognise && (
         <div className={cx("flex items-center gap-3.5 p-5", age === "ADULT" ? "border-t border-canvas-line px-0 py-6" : "flex-col")}>
           <button type="button" onClick={record} aria-label={t.tap} className={micButton}>
-            {age === "CHILD" ? <MicIcon /> : <span className={cx("rounded-xl", age === "TEEN" ? "h-[38px] w-6 bg-night" : "h-[26px] w-4 bg-canvas")} aria-hidden />}
+            {age === "CHILD" ? <MicIcon /> : age === "TEEN" ? <MicIcon size={34} color="var(--color-night)" /> : <MicIcon size={24} color="var(--color-canvas)" />}
           </button>
           <span className={age === "TEEN" ? "font-mono text-xs text-night-muted" : age === "CHILD" ? "text-[17px] font-bold" : "text-[15px]"}>{t.tap}</span>
         </div>
@@ -273,7 +280,8 @@ export function SpeakingExercise({ exercise, onSolved, onContinue, showXp }: Exe
               </p>
               {exercise.tip.audio && tipClip.supported && (
                 <button type="button" onClick={tipClip.play} className={cx("rounded-full px-3.5 py-2.5 font-mono text-xs", age === "CHILD" ? "bg-card" : "shadow-[inset_0_0_0_1px_currentColor]")}>
-                  ▶ {exercise.tip.audio.text.length > 24 ? "listen" : exercise.tip.audio.text}
+                  <PlayGlyph />
+                  {exercise.tip.audio.text.length > 24 ? "listen" : exercise.tip.audio.text}
                 </button>
               )}
             </div>

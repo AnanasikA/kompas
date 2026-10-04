@@ -140,7 +140,7 @@ check("feedback: the tab stays out of the way on a phone", await (async () => {
   await p2.waitForLoadState("networkidle");
   const box = await p2.getByRole("button", { name: "UWAGI" }).boundingBox();
   const fits = await p2.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1);
-  return fits && !!box && box.width <= 28 && box.x + box.width <= 391;
+  return fits && !!box && box.width <= 16 && box.x + box.width <= 391;
 })());
 
 check("no console errors", errors.length === 0, errors.slice(0, 3).join(" | "));

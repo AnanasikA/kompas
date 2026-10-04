@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { lessonStepCount } from "@/features/learning/engine/xp";
@@ -120,7 +121,7 @@ export function LessonPlayer({ lessonId }: { lessonId: string }) {
               age === "CHILD" ? "size-11 rounded-[14px] text-xl shadow-[inset_0_0_0_2px_var(--color-line)] hover:bg-sand" : "size-10 rounded-lg text-base shadow-[inset_0_0_0_1px_var(--color-night-line)]",
             )}
           >
-            <span aria-hidden>✕</span>
+            <X aria-hidden size={20} strokeWidth={2.5} />
           </button>
         )}
 
@@ -161,7 +162,7 @@ export function LessonPlayer({ lessonId }: { lessonId: string }) {
         </div>
 
         {age === "ADULT" ? (
-          <button type="button" onClick={() => setQuitOpen(true)} className="rounded text-sm text-muted">
+          <button type="button" onClick={() => setQuitOpen(true)} className="k-tap rounded text-sm text-muted">
             Zapisz i wyjdź
           </button>
         ) : (

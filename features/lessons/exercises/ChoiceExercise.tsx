@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Illustration } from "@/components/ui/Illustration";
-import { PlayTriangle, SpeakerIcon } from "@/components/ui/icons";
+import { PlayGlyph, PlayTriangle, SpeakerIcon } from "@/components/ui/icons";
 import { evaluateChoice } from "@/features/learning/engine/evaluate";
 import { xpForExercise } from "@/features/learning/engine/xp";
 import { useAge } from "@/features/theme/AgeScope";
@@ -379,7 +379,8 @@ function PromptHeader({ exercise, filled }: { exercise: Exclude<ChoiceEx, Listen
           </span>
           {targetClip.supported && (
             <button type="button" onClick={targetClip.play} className="rounded-full bg-sky-soft px-3.5 py-2.5 font-mono text-xs">
-              ▶ posłuchaj
+              <PlayGlyph />
+              posłuchaj
             </button>
           )}
         </div>

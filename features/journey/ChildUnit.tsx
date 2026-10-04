@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Check, RotateCw, Star } from "lucide-react";
 import { getTopic } from "@/data/topics";
 import { lessonMaxXp } from "@/features/learning/engine/xp";
 import type { LessonState } from "@/features/progress/units";
@@ -112,7 +113,7 @@ export function ChildUnit({ unitId }: { unitId: string }) {
                           !isCurrent && !done && "border-[3px] border-dashed border-[oklch(0.75_0.02_85)] bg-[oklch(0.97_0.01_85)] text-faint shadow-[0_3px_0_oklch(0.82_0.02_85)]",
                         )}
                       >
-                        {done ? "✓" : kind === "CHECKPOINT" ? "★" : kind === "REVIEW" ? "↻" : l.lesson.order}
+                        {done ? <Check size={26} strokeWidth={3} /> : kind === "CHECKPOINT" ? <Star size={26} strokeWidth={2.4} /> : kind === "REVIEW" ? <RotateCw size={24} strokeWidth={2.4} /> : l.lesson.order}
                       </span>
                     </span>
                     <span className="relative flex flex-col gap-1 bg-card md:items-center md:px-1">

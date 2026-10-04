@@ -2,15 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { BarChart3, Home, Map as MapIcon, Target, type LucideIcon } from "lucide-react";
 import { useLearner } from "@/features/progress/useLearner";
 import { initialOf } from "@/features/theme/avatar";
 import { cx } from "@/lib/utils";
 
-const TABS = [
-  { href: "/home", label: "Home", radius: "50%", rotate: false },
-  { href: "/journey", label: "Journey", radius: "2px", rotate: true },
-  { href: "/practice", label: "Practice", radius: "3px", rotate: false },
-  { href: "/me", label: "Stats", radius: "50%", rotate: false },
+const TABS: { href: string; label: string; icon: LucideIcon }[] = [
+  { href: "/home", label: "Home", icon: Home },
+  { href: "/journey", label: "Journey", icon: MapIcon },
+  { href: "/practice", label: "Practice", icon: Target },
+  { href: "/me", label: "Stats", icon: BarChart3 },
 ];
 
 /** Player shell: icon rail on desktop, bottom bar on phones. */
@@ -33,7 +34,7 @@ export function TeenShell({ children }: { children: React.ReactNode }) {
             on ? "bg-night-raised text-lime" : "text-night-muted",
           )}
         >
-          <span className={cx("size-3 border-2 border-current", t.rotate && "rotate-45", on && "bg-lime")} style={{ borderRadius: t.radius }} aria-hidden />
+          <t.icon aria-hidden size={18} strokeWidth={on ? 2.4 : 2} />
           <span className="text-[9px] font-semibold">{t.label}</span>
           {t.href === "/practice" && due.length > 0 && (
             <span className="absolute right-1.5 top-1 rounded-sm bg-grape px-1 font-mono text-[9px] text-night" aria-label={`${due.length} due`}>

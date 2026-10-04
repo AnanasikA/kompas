@@ -116,7 +116,7 @@ export function ChildHome() {
           )}
           <Link
             href={continueHref}
-            className="rounded-[20px] bg-ink p-5 text-center font-display text-[22px] font-extrabold tracking-[0.02em] text-on-ink shadow-[0_6px_0_var(--color-ink-deep)] transition-transform hover:bg-ink-soft active:translate-y-[5px] active:shadow-[0_1px_0_var(--color-ink-deep)]"
+            className="rounded-[20px] bg-ink px-3 py-5 text-center font-display text-[clamp(16px,5vw,22px)] font-extrabold tracking-[0.02em] text-on-ink shadow-[0_6px_0_var(--color-ink-deep)] transition-transform hover:bg-ink-soft active:translate-y-[5px] active:shadow-[0_1px_0_var(--color-ink-deep)]"
           >
             {lesson ? "CONTINUE ADVENTURE →" : "OTWÓRZ MAPĘ →"}
           </Link>

@@ -1,5 +1,6 @@
 "use client";
 
+import { PlayGlyph } from "@/components/ui/icons";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ScriptedResponder, createDialogueState, longestPath, type DialogueState } from "@/features/learning/dialogue/engine";
 import { xpForExercise } from "@/features/learning/engine/xp";
@@ -148,10 +149,11 @@ export function DialogueExercise({ exercise, onMistake, onSolved, onContinue, sh
         "self-start font-mono text-[11px]",
         age === "CHILD" && "rounded-full bg-sky-soft px-3 py-[7px]",
         age === "TEEN" && "rounded px-2.5 py-1.5 shadow-[inset_0_0_0_1px_var(--color-night-line)]",
-        age === "ADULT" && "text-muted",
+        age === "ADULT" && "k-tap text-muted",
       )}
     >
-      {age === "CHILD" ? `▶ posłuchaj ${character.name === "Sam" ? "Sama" : character.name}` : "▶ REPLAY"}
+      <PlayGlyph />
+      {age === "CHILD" ? `posłuchaj ${character.name === "Sam" ? "Sama" : character.name}` : "REPLAY"}
     </button>
   );
 

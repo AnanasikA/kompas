@@ -1,53 +1,38 @@
-/** Small CSS-drawn icons used by the prototype. Decorative: always paired with text. */
+import { Lock, Mic, Play, Square, Undo2, Volume2 } from "lucide-react";
+
+/**
+ * Icons. One line-icon family (Lucide) everywhere, so the three age modes
+ * share the same visual vocabulary. Decorative: always paired with text or an
+ * aria-label on the control.
+ */
 
 export function PlayTriangle({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
-  return (
-    <span
-      aria-hidden
-      className="inline-block"
-      style={{
-        width: 0,
-        height: 0,
-        borderLeft: `${size}px solid ${color}`,
-        borderTop: `${Math.round(size * 0.62)}px solid transparent`,
-        borderBottom: `${Math.round(size * 0.62)}px solid transparent`,
-        marginLeft: Math.round(size / 4),
-      }}
-    />
-  );
+  return <Play aria-hidden size={Math.round(size * 1.25)} color={color} fill={color} strokeWidth={2} className="inline-block shrink-0" />;
 }
 
-export function SpeakerIcon({ color = "oklch(0.99 0.004 85)" }: { color?: string }) {
-  return (
-    <span className="flex items-center gap-1" aria-hidden>
-      <span className="h-4 w-3 rounded-[2px]" style={{ background: color }} />
-      <span style={{ width: 0, height: 0, borderRight: `14px solid ${color}`, borderTop: "14px solid transparent", borderBottom: "14px solid transparent", marginLeft: -6 }} />
-      <span className="ml-1 h-5 w-2 rounded-r-xl" style={{ border: `3px solid ${color}`, borderLeft: "none" }} />
-    </span>
-  );
+/** Small "play" mark in front of a label, sized to the text around it. */
+export function PlayGlyph({ className = "mr-1.5" }: { className?: string }) {
+  return <Play aria-hidden size="0.85em" fill="currentColor" strokeWidth={2} className={`inline-block shrink-0 align-[-0.08em] ${className}`} />;
 }
 
-export function MicIcon({ color = "oklch(0.99 0.004 85)" }: { color?: string }) {
-  return (
-    <span className="flex flex-col items-center gap-[3px]" aria-hidden>
-      <span className="h-11 w-7 rounded-[14px]" style={{ background: color }} />
-      <span className="-mt-3.5 h-4 w-10 rounded-b-[20px]" style={{ border: `4px solid ${color}`, borderTop: "none" }} />
-      <span className="h-2 w-1" style={{ background: color }} />
-    </span>
-  );
+export function UndoGlyph() {
+  return <Undo2 aria-hidden size="1.1em" strokeWidth={2.2} className="mr-1 inline-block shrink-0 align-[-0.18em]" />;
+}
+
+export function SpeakerIcon({ color = "oklch(0.99 0.004 85)", size = 34 }: { color?: string; size?: number }) {
+  return <Volume2 aria-hidden size={size} color={color} strokeWidth={2.25} />;
+}
+
+export function MicIcon({ color = "oklch(0.99 0.004 85)", size = 52 }: { color?: string; size?: number }) {
+  return <Mic aria-hidden size={size} color={color} strokeWidth={2} />;
 }
 
 export function StopSquare({ color = "currentColor", size = 16 }: { color?: string; size?: number }) {
-  return <span aria-hidden className="inline-block rounded-[3px]" style={{ width: size, height: size, background: color }} />;
+  return <Square aria-hidden size={size} color={color} fill={color} strokeWidth={2} className="inline-block shrink-0" />;
 }
 
-export function LockIcon({ color = "oklch(0.60 0.02 85)" }: { color?: string }) {
-  return (
-    <span className="flex flex-col items-center" aria-hidden>
-      <span className="h-2.5 w-3.5 rounded-t-lg" style={{ border: `3px solid ${color}`, borderBottom: "none" }} />
-      <span className="h-4 w-[22px] rounded" style={{ background: color }} />
-    </span>
-  );
+export function LockIcon({ color = "oklch(0.50 0.02 85)", size = 22 }: { color?: string; size?: number }) {
+  return <Lock aria-hidden size={size} color={color} strokeWidth={2.25} />;
 }
 
 /** Animated bars shown while the microphone is listening. */

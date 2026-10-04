@@ -179,28 +179,28 @@ export function PracticeHome() {
           {due.length > 0 ? (
             <Link
               href="/practice/session"
-              className="self-start rounded-[18px] bg-ink px-8 py-[18px] font-display text-xl font-extrabold text-on-ink shadow-[0_6px_0_var(--color-ink-deep)] transition-transform active:translate-y-[5px] active:shadow-[0_1px_0_var(--color-ink-deep)]"
+              className="self-start rounded-[18px] bg-ink px-[clamp(18px,6vw,32px)] py-[18px] font-display text-[clamp(17px,5vw,20px)] font-extrabold text-on-ink shadow-[0_6px_0_var(--color-ink-deep)] transition-transform active:translate-y-[5px] active:shadow-[0_1px_0_var(--color-ink-deep)]"
             >
               Start powtórki · {minutes} min
             </Link>
           ) : (
-            <Link href={lessonHref} className="self-start rounded-[18px] bg-card px-8 py-[18px] font-display text-xl font-extrabold shadow-[0_6px_0_oklch(0.80_0.08_35)]">
+            <Link href={lessonHref} className="self-start rounded-[18px] bg-card px-[clamp(18px,6vw,32px)] py-[18px] font-display text-[clamp(17px,5vw,20px)] font-extrabold shadow-[0_6px_0_oklch(0.80_0.08_35)]">
               Przejdź do lekcji →
             </Link>
           )}
         </div>
-        <dl className="m-0 grid grid-cols-3 items-end gap-3 bg-[oklch(0.91_0.06_35)] p-[clamp(24px,3vw,36px)]">
+        <dl className="m-0 grid grid-cols-3 items-end gap-2 bg-[oklch(0.91_0.06_35)] p-[clamp(16px,3vw,36px)] sm:gap-3">
           {(
             [
-              [counts.mastered, "opanowanych", "bg-moss"],
+              [counts.mastered, "opanowane", "bg-moss"],
               [due.length, "do powtórki", "bg-amber"],
-              [counts.weak, "trudnych", "bg-coral"],
+              [counts.weak, "trudne", "bg-coral"],
             ] as const
           ).map(([value, label, color]) => {
             const max = Math.max(1, counts.mastered, due.length, counts.weak);
             return (
               <div key={label} className="flex flex-col-reverse gap-2">
-                <dt className="text-sm font-bold">{label}</dt>
+                <dt className="text-xs font-bold leading-tight sm:text-sm">{label}</dt>
                 <dd className={cx("m-0 flex items-end rounded-[16px_16px_4px_4px] p-3 font-display text-[40px] font-extrabold leading-none", color)} style={{ height: 56 + (value / max) * 94 }}>
                   {value}
                 </dd>

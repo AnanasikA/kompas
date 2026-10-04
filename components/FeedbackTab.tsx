@@ -59,7 +59,9 @@ export function FeedbackTab() {
         onClick={open}
         aria-haspopup="dialog"
         // Vertical text: Tailwind's px/py follow the text direction, so px is the vertical padding here.
-        className="fixed right-0 top-[38%] z-30 rounded-l-lg bg-ink px-3 py-1.5 font-mono text-[11px] leading-none tracking-[0.08em] text-on-ink opacity-80 [writing-mode:vertical-rl] hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-amber print:hidden"
+        // On phones the strip is as narrow as the page margin, so it never covers content; the
+        // invisible ::before makes it easy to hit anyway.
+        className="fixed right-0 top-[108px] z-30 rounded-l-md bg-ink px-2.5 py-[3px] font-mono text-[9px] leading-none tracking-[0.08em] before:absolute before:inset-y-0 before:-left-3 before:right-0 before:content-[''] sm:rounded-l-lg sm:px-3 sm:py-1.5 sm:text-[11px] text-on-ink opacity-80 [writing-mode:vertical-rl] hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-amber print:hidden"
       >
         UWAGI
       </button>

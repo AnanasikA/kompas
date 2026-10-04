@@ -91,7 +91,7 @@ export function LessonStart({ lessonId }: { lessonId: string }) {
   if (age === "TEEN") {
     return (
       <div className="flex min-h-dvh flex-col gap-6 p-[clamp(20px,3vw,40px)]">
-        <Link href="/journey" className="self-start rounded text-[13px] text-night-muted">
+        <Link href="/journey" className="k-tap self-start rounded text-[13px] text-night-muted">
           ← {unit.title} arc
         </Link>
         <div className="mx-auto grid grid-cols-1 w-full max-w-[1200px] flex-1 items-center gap-7 lg:grid-cols-2">
@@ -164,7 +164,7 @@ export function LessonStart({ lessonId }: { lessonId: string }) {
   if (age === "ADULT") {
     return (
       <div className="flex min-h-dvh flex-col p-[clamp(24px,4vw,56px)]">
-        <Link href="/journey" className="self-start rounded text-sm text-muted">
+        <Link href="/journey" className="k-tap self-start rounded text-sm text-muted">
           ← {unit.title}
         </Link>
         <div className="mx-auto grid grid-cols-1 w-full max-w-[1120px] flex-1 items-center gap-[clamp(32px,6vw,80px)] py-8 lg:grid-cols-2">
@@ -172,7 +172,7 @@ export function LessonStart({ lessonId }: { lessonId: string }) {
             <p className="m-0 font-mono text-xs tracking-[0.12em] text-muted">
               {lesson.level} · LESSON {String(lesson.order).padStart(2, "0")}
             </p>
-            <h1 className="m-0 font-serif text-[clamp(56px,7vw,92px)] font-normal leading-[0.92]">{lesson.title}</h1>
+            <h1 className="m-0 font-serif text-[clamp(40px,7vw,84px)] font-normal leading-[0.95]">{lesson.title}</h1>
             <div className="flex max-w-[44ch] flex-col gap-1.5">
               <span className="font-mono text-[11px] tracking-[0.12em] text-azure">GOAL</span>
               <p className="m-0 text-[19px] leading-normal">{lesson.canDo}</p>
@@ -221,7 +221,7 @@ export function LessonStart({ lessonId }: { lessonId: string }) {
   return (
     <div className="flex min-h-dvh flex-col bg-paper">
       <div className="flex items-center justify-between px-[clamp(20px,3vw,40px)] py-[18px]">
-        <Link href={`/journey/${unit.id}`} className="rounded-xl px-3.5 py-2.5 text-[15px] font-bold hover:bg-sand">
+        <Link href={`/journey/${unit.id}`} className="k-tap rounded-xl px-3.5 py-2.5 text-[15px] font-bold hover:bg-sand">
           ← {unit.title}
         </Link>
         <div className="font-mono text-xs uppercase text-muted">

@@ -22,7 +22,7 @@ export function SettingsScreen() {
   const [confirm, setConfirm] = useState<"reset" | "signout" | null>(null);
 
   const row = "flex flex-wrap items-center justify-between gap-4 border-b border-[var(--k-line)] py-[18px] last:border-b-0";
-  const seg = cx("flex gap-1 p-1", age === "CHILD" ? "rounded-xl bg-sand" : age === "TEEN" ? "rounded-md shadow-[inset_0_0_0_1px_var(--color-night-line)]" : "rounded-md shadow-[inset_0_0_0_1px_var(--color-canvas-line-strong)]");
+  const seg = cx("flex w-full gap-1 p-1 sm:w-auto", age === "CHILD" ? "rounded-xl bg-sand" : age === "TEEN" ? "rounded-md shadow-[inset_0_0_0_1px_var(--color-night-line)]" : "rounded-md shadow-[inset_0_0_0_1px_var(--color-canvas-line-strong)]");
   const segOn = { CHILD: "bg-ink text-on-ink", TEEN: "bg-grape text-night", ADULT: "bg-ink text-canvas" }[age];
   const danger = cx("px-4 py-2.5 text-sm font-semibold", age === "CHILD" ? "rounded-xl shadow-[inset_0_0_0_2px_var(--color-line)] hover:bg-sand" : "rounded-md shadow-[inset_0_0_0_1px_var(--k-line)]");
 
@@ -40,7 +40,7 @@ export function SettingsScreen() {
           </div>
           <div className={seg} role="radiogroup" aria-labelledby="goal-label">
             {GOALS.map((m) => (
-              <button key={m} type="button" role="radio" aria-checked={user.dailyGoal === m} onClick={() => setDailyGoal(m)} className={cx("rounded-[9px] px-3 py-2 text-[13px] font-bold", user.dailyGoal === m && segOn)}>
+              <button key={m} type="button" role="radio" aria-checked={user.dailyGoal === m} onClick={() => setDailyGoal(m)} className={cx("flex-1 whitespace-nowrap rounded-[9px] px-2 py-2.5 text-[13px] font-bold sm:px-3", user.dailyGoal === m && segOn)}>
                 {m} min
               </button>
             ))}

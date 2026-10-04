@@ -73,7 +73,7 @@ export function AdultHome() {
             <span aria-hidden>→</span>
           </Link>
           <div className="flex flex-wrap gap-6 text-sm text-muted">
-            <Link href="/practice" className="rounded underline-offset-4 hover:underline">
+            <Link href="/practice" className="k-tap rounded underline-offset-4 hover:underline">
               {due.length} {due.length === 1 ? "karta" : "kart"} do powtórki
             </Link>
             {last && (

@@ -2,24 +2,21 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Dumbbell, Home, Map as MapIcon, User, type LucideIcon } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { useLearner } from "@/features/progress/useLearner";
 import { AVATAR_COLORS, initialOf } from "@/features/theme/avatar";
 import { cx } from "@/lib/utils";
 
-const TABS = [
-  { href: "/home", label: "Start", radius: "50%", rotate: false },
-  { href: "/journey", label: "Podróż", radius: "5px", rotate: true },
-  { href: "/practice", label: "Trening", radius: "7px", rotate: false },
-  { href: "/me", label: "Ja", radius: "50%", rotate: false },
+const TABS: { href: string; label: string; icon: LucideIcon }[] = [
+  { href: "/home", label: "Start", icon: Home },
+  { href: "/journey", label: "Podróż", icon: MapIcon },
+  { href: "/practice", label: "Trening", icon: Dumbbell },
+  { href: "/me", label: "Ja", icon: User },
 ];
 
-function TabIcon({ radius, rotate, on }: { radius: string; rotate: boolean; on: boolean }) {
-  return (
-    <span className="grid size-5 place-items-center" aria-hidden>
-      <span className={cx("size-[17px] border-[2.5px] border-ink", rotate && "rotate-45", on && "bg-ink")} style={{ borderRadius: radius }} />
-    </span>
-  );
+function TabIcon({ icon: Icon, on }: { icon: LucideIcon; on: boolean }) {
+  return <Icon aria-hidden size={22} strokeWidth={on ? 2.6 : 2.1} className="shrink-0" />;
 }
 
 /** Explorer shell: sidebar on desktop, bottom tab bar on phones. */
@@ -72,7 +69,7 @@ export function ChildShell({ children }: { children: React.ReactNode }) {
                   on ? "bg-amber font-extrabold shadow-[0_4px_0_var(--color-amber-deep)]" : "font-semibold hover:bg-[oklch(0.92_0.03_80)]",
                 )}
               >
-                <TabIcon radius={t.radius} rotate={t.rotate} on={on} />
+                <TabIcon icon={t.icon} on={on} />
                 <span className="flex-1">{t.label}</span>
                 {t.href === "/practice" && due.length > 0 && (
                   <span className="rounded-full bg-coral px-2 py-0.5 font-mono text-[11px]" aria-label={`${due.length} do powtórki`}>
@@ -113,7 +110,7 @@ export function ChildShell({ children }: { children: React.ReactNode }) {
               aria-current={on ? "page" : undefined}
               className={cx("relative flex flex-col items-center gap-1 rounded-2xl py-2 font-display text-[13px]", on ? "bg-amber font-extrabold" : "font-semibold")}
             >
-              <TabIcon radius={t.radius} rotate={t.rotate} on={on} />
+              <TabIcon icon={t.icon} on={on} />
               {t.label}
               {t.href === "/practice" && due.length > 0 && (
                 <span className="absolute right-[18%] top-1 rounded-full bg-coral px-1.5 font-mono text-[10px]" aria-label={`${due.length} do powtórki`}>

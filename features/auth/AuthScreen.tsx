@@ -117,9 +117,10 @@ export function AuthScreen() {
               type="button"
               disabled
               title="Logowanie przez konta zewnętrzne pojawi się razem z backendem"
-              className="rounded-xl p-[13px] text-center text-[15px] font-semibold text-faint shadow-[inset_0_0_0_1.5px_var(--color-line-strong)]"
+              className="flex flex-col items-center rounded-xl p-2.5 text-[15px] font-semibold leading-tight text-faint shadow-[inset_0_0_0_1.5px_var(--color-line-strong)]"
             >
-              {provider} <span className="font-mono text-[10px] font-normal">· wkrótce</span>
+              {provider}
+              <span className="font-mono text-[10px] font-normal">wkrótce</span>
             </button>
           ))}
         </div>

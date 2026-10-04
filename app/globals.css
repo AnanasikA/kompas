@@ -12,7 +12,12 @@
   /* Typography */
   --font-display: "Bricolage Grotesque Variable", "Bricolage Grotesque", system-ui, sans-serif;
   --font-sans: "Instrument Sans Variable", "Instrument Sans", system-ui, sans-serif;
-  --font-serif: "Instrument Serif", Georgia, serif;
+  /*
+   * Display face of the adult ("Navigator") mode: Instrument Sans, slightly
+   * condensed and semi-bold (see `.font-serif` below). The utility keeps its
+   * old name `font-serif`; to try another face, change this one line.
+   */
+  --font-serif: "Instrument Sans Variable", "Instrument Sans", system-ui, sans-serif;
   --font-mono: "DM Mono", ui-monospace, monospace;
 
   /* Ink + paper (common / child) */
@@ -177,8 +182,9 @@
   --k-focus: var(--color-azure);
   --k-radius: 8px;
   --k-heading: var(--font-serif);
-  --k-heading-weight: 400;
-  --k-heading-tracking: -0.01em;
+  --k-heading-weight: 600;
+  --k-heading-tracking: -0.03em;
+  --k-heading-stretch: 88%;
 }
 
 html {
@@ -219,6 +225,17 @@ button:disabled {
   outline-offset: 3px;
 }
 
+/* Focus moved by the app itself (next task of a lesson) is for screen readers, not a frame on screen. */
+[tabindex="-1"]:focus-visible {
+  outline: none;
+}
+
+/* Labels that need two lines break evenly, so an arrow never ends up alone on the second line. */
+a,
+button {
+  text-wrap: balance;
+}
+
 /* On dark panels inside light screens the ink outline would disappear. */
 .bg-ink :focus-visible,
 .bg-ink-raised :focus-visible,
@@ -230,6 +247,14 @@ button:disabled {
   font-family: var(--k-heading);
   font-weight: var(--k-heading-weight);
   letter-spacing: var(--k-heading-tracking);
+  font-stretch: var(--k-heading-stretch, 100%);
+}
+
+/* Adult display text: big numbers, lesson titles, quotes. */
+.font-serif {
+  font-weight: 600;
+  font-stretch: 88%;
+  letter-spacing: -0.03em;
 }
 
 /* Recording bars: each bar gets its own duration/delay inline. */

@@ -168,7 +168,7 @@ await shot("17-ex4-sentence-almost");
 await button("Spróbuj ponownie").click();
 await bank.getByRole("button", { name: "I'd", exact: true }).click();
 await bank.getByRole("button", { name: "a", exact: true }).click();
-await button("↶ Cofnij").click();
+await button("Cofnij").click();
 check("11b. undo removes the last word", (await page.getByRole("group", { name: "Twoje zdanie" }).getByRole("button").count()) === 1);
 await button("Wyczyść").click();
 check("11c. reset clears the sentence", (await page.getByRole("group", { name: "Twoje zdanie" }).getByRole("button").count()) === 0);

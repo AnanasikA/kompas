@@ -1,5 +1,6 @@
 "use client";
 
+import { PlayGlyph } from "@/components/ui/icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getConcept } from "@/data/curriculum";
@@ -80,8 +81,8 @@ export function LessonSummary({ lessonId }: { lessonId: string }) {
             <h2 className="m-0 font-display text-[19px] font-extrabold">New phrases · {lesson.vocabulary.length}</h2>
             {lesson.vocabulary.map((v) => (
               <div key={v.term} className="flex items-baseline justify-between gap-3 text-[15px]">
-                <button type="button" onClick={() => say(v.term)} className="rounded text-left hover:text-lime" aria-label={`Play: ${v.term}`}>
-                  <span aria-hidden className="mr-2 font-mono text-[10px] text-night-muted">▶</span>
+                <button type="button" onClick={() => say(v.term)} className="k-tap rounded text-left hover:text-lime" aria-label={`Play: ${v.term}`}>
+                  <PlayGlyph className="mr-2 text-[11px] text-night-muted" />
                   {v.term}
                 </button>
                 <span className="text-right text-[13px] text-night-muted">{v.translation}</span>
@@ -152,7 +153,7 @@ export function LessonSummary({ lessonId }: { lessonId: string }) {
                     <span className="text-[13px] text-muted">{v.translation}</span>
                   </span>
                   <button type="button" onClick={() => say(v.term)} aria-label={`Listen: ${v.term}`} className="grid size-[34px] place-items-center rounded-full text-[10px] shadow-[inset_0_0_0_1px_oklch(0.80_0.01_90)]">
-                    ▶
+                    <PlayGlyph className="" />
                   </button>
                 </div>
               ))}
@@ -219,12 +220,12 @@ export function LessonSummary({ lessonId }: { lessonId: string }) {
           </div>
           <ul className="m-0 list-none p-0">
             {lesson.vocabulary.map((v) => (
-              <li key={v.term} className="grid grid-cols-[40px_minmax(0,1fr)_auto] items-center gap-3.5 border-t border-line-soft py-2.5">
+              <li key={v.term} className="grid grid-cols-[40px_minmax(0,1fr)] items-center gap-x-3.5 border-t border-line-soft py-2.5 sm:grid-cols-[40px_minmax(0,1fr)_auto]">
                 <button type="button" onClick={() => say(v.term)} aria-label={`Posłuchaj: ${v.term}`} className="grid size-[38px] place-items-center rounded-xl bg-sky-soft text-xs">
-                  ▶
+                  <PlayGlyph className="" />
                 </button>
                 <span className="font-display text-[19px] font-extrabold">{v.term}</span>
-                <span className="text-right text-sm text-muted">{v.translation}</span>
+                <span className="col-start-2 text-sm text-muted sm:col-start-3 sm:text-right">{v.translation}</span>
               </li>
             ))}
           </ul>

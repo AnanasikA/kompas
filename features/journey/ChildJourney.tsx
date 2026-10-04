@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Check, RotateCw, Star } from "lucide-react";
 import { LockIcon } from "@/components/ui/icons";
 import { getGrammarTopic } from "@/data/cefr/program";
 import { getTopic } from "@/data/topics";
@@ -227,7 +228,7 @@ function Island({
                             .join(", "),
                         }}
                       >
-                        {kind === "done" ? "✓" : kind === "locked" ? <LockIcon /> : type === "CHECKPOINT" ? "★" : type === "REVIEW" ? "↻" : l.lesson.order}
+                        {kind === "done" ? <Check aria-hidden size={24} strokeWidth={3} /> : kind === "locked" ? <LockIcon /> : type === "CHECKPOINT" ? <Star aria-hidden size={24} strokeWidth={2.4} /> : type === "REVIEW" ? <RotateCw aria-hidden size={22} strokeWidth={2.4} /> : l.lesson.order}
                       </span>
                     </button>
                   </li>

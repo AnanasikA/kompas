@@ -169,6 +169,13 @@ najpierw słowa, przy których była pomyłka, potem nowe, potem najsłabiej zna
 „skończyć”. Dodanie słowa albo tematu do pliku od razu trafia do gry; światy wskazują swój temat
 polem `topic`.
 
+## Ikony i kroje
+
+- Ikony: jedna rodzina liniowa (`lucide-react`), opakowana w `components/ui/icons.tsx`.
+- Kroje: Bricolage Grotesque (nagłówki dzieci i nastolatków), Instrument Sans (tekst oraz —
+  zwężony i półgruby — nagłówki dorosłych), DM Mono (etykiety). Krój nagłówków dorosłych zmienia
+  się jedną linią `--font-serif` w `app/globals.css`.
+
 ## Trzy tryby wiekowe
 
 `User.ageGroup` → `<AgeScope>` ustawia `data-age` i kontekst. Ekrany o różnym układzie
