@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   title: "Kompas — angielski, który dzieje się naprawdę",
   description:
     "Platforma do nauki angielskiego dla dzieci, nastolatków i dorosłych. Jeden program CEFR, trzy sposoby nauki.",
+  robots: { index: false, follow: false },
 };
 
 export const viewport: Viewport = {

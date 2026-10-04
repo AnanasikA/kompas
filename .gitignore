@@ -42,3 +42,6 @@ next-env.d.ts
 
 # e2e output
 /tests/e2e/screenshots
+
+.vercel
+.env*
