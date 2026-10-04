@@ -53,8 +53,8 @@ export function LevelPath({ levels }: { levels: PathLevel[] }) {
         </ol>
       </div>
 
-      <div aria-live="polite" className="grid grid-cols-1 gap-x-10 gap-y-5 rounded-[22px] bg-card p-[clamp(20px,2.6vw,30px)] shadow-[inset_0_0_0_1.5px_var(--color-line-soft)] md:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">
-        <div className="flex flex-col gap-3">
+      <div aria-live="polite" className="grid grid-cols-1 gap-x-10 gap-y-5 rounded-[22px] bg-card p-[clamp(14px,1.6vw,20px)] shadow-[inset_0_0_0_1.5px_var(--color-line-soft)] md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] md:items-center">
+        <div className="flex flex-col gap-3 rounded-[16px] bg-sand p-5">
           <h3 className="m-0 font-display text-[clamp(30px,3.4vw,42px)] font-extrabold leading-none tracking-[-0.03em]">
             <span className="sr-only">Poziom </span>
             {current.level}
@@ -65,12 +65,12 @@ export function LevelPath({ levels }: { levels: PathLevel[] }) {
             {current.grammar} zagadnień gramatycznych
           </p>
         </div>
-        <div className="flex flex-col gap-2.5">
+        <div className="flex flex-col gap-2.5 p-2">
           <p className="m-0 font-mono text-[11px] tracking-[0.1em] text-faint">PO TYM POZIOMIE</p>
           <ul className="m-0 flex list-none flex-col gap-2 p-0 text-[15px] leading-snug text-body">
             {current.canDo.slice(0, 4).map((line) => (
               <li key={line} className="flex gap-2.5">
-                <Check aria-hidden size={16} strokeWidth={2.6} className="mt-[3px] shrink-0 text-ink" />
+                <Check aria-hidden size={16} strokeWidth={2.8} className="mt-[3px] shrink-0 text-ink" />
                 {line}
               </li>
             ))}
