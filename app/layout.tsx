@@ -9,9 +9,9 @@ import { AppProviders } from "@/components/AppProviders";
 import { FeedbackTab } from "@/components/FeedbackTab";
 
 export const metadata: Metadata = {
-  title: "Kompas — angielski, który dzieje się naprawdę",
+  title: "Kompas – angielski online dla dzieci, nastolatków i dorosłych",
   description:
-    "Platforma do nauki angielskiego dla dzieci, nastolatków i dorosłych. Jeden program CEFR, trzy sposoby nauki.",
+    "Ucz się angielskiego w praktycznych sytuacjach. Interaktywne lekcje, mówienie, słuchanie i inteligentne powtórki na poziomach CEFR Pre-A1–B2.",
   // Wersja pokazowa z kontami testowymi: nie do wyszukiwarek. Usuń przy publicznym starcie.
   robots: { index: false, follow: false },
   applicationName: "Kompas",

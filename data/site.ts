@@ -10,5 +10,5 @@
  */
 export const FEEDBACK = {
   enabled: true,
-  email: "",
+  email: "anastasiia.kupriianets@outlook.com",
 };
