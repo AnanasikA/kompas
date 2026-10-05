@@ -67,7 +67,7 @@ export const INFO_PAGES: InfoPage[] = [
       },
       {
         title: "Uwagi wysyłane z aplikacji",
-        text: ["Uwagę z zakładki „Uwagi” wysyłasz samodzielnie, wybranym przez siebie sposobem. Zawiera ona tylko to, co widzisz przed wysłaniem: treść, nazwę ekranu, tryb i typ urządzenia."],
+        text: ["Uwaga z zakładki „Uwagi” trafia na skrzynkę e-mail autorki aplikacji za pośrednictwem usługi FormSubmit. Zawiera treść, którą wpisujesz, oraz nazwę ekranu, tryb i typ urządzenia. Nie podawaj w niej danych osobowych."],
       },
       {
         title: "Usunięcie danych",

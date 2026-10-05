@@ -124,16 +124,34 @@ const manifest = await (await page.request.get(`${BASE}/manifest.webmanifest`)).
 check("manifest: installable (name, standalone, 192 + 512 icons)", manifest.short_name === "Kompas" && manifest.display === "standalone" && manifest.icons.length === 3);
 for (const icon of manifest.icons) check(`manifest: ${icon.src} is served`, (await page.request.get(`${BASE}${icon.src}`)).status() === 200);
 await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+// The note is posted to a form-to-e-mail service. The test answers in its place: nothing leaves the machine.
+const posted = [];
+let deliver = true;
+await page.route("https://formsubmit.co/**", async (route) => {
+  posted.push({ url: route.request().url(), body: route.request().postDataJSON() });
+  await route.fulfill({ status: 200, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify(deliver ? { success: "true", message: "ok" } : { success: "false", message: "This form needs Activation." }) });
+});
 await page.goto(`${BASE}/auth?mode=login`);
 await page.waitForLoadState("networkidle");
-await page.evaluate(() => delete Navigator.prototype.share); // desktop path: copy instead of share
 await btn("UWAGI").click();
 check("feedback: cannot send an empty note", await btn("Wyślij uwagę").isDisabled());
 await page.getByLabel("Twoja uwaga").fill("Przycisk jest za mały");
 await btn("Wyślij uwagę").click();
+await page.getByText("Dziękujemy! Uwaga wysłana.").waitFor();
+const sentNote = posted[0]?.body ?? {};
+check("feedback: one click sends the note to the author's inbox", posted.length === 1 && posted[0].url.endsWith("/ajax/anastasiia.kupriianets@outlook.com"), posted[0]?.url);
+check("feedback: the note carries the text and the screen it was written on", sentNote.Uwaga === "Przycisk jest za mały" && sentNote.Ekran === "/auth" && String(sentNote._subject).includes("/auth"), JSON.stringify(sentNote).slice(0, 120));
+check("feedback: the field is cleared after sending", (await page.getByLabel("Twoja uwaga").inputValue()) === "");
+deliver = false;
+await page.getByLabel("Twoja uwaga").fill("Druga uwaga");
+await btn("Wyślij uwagę").click();
+await page.getByText("Nie udało się wysłać.").waitFor();
+check("feedback: when sending fails the text is kept", (await page.getByLabel("Twoja uwaga").inputValue()) === "Druga uwaga");
+await btn("Skopiuj uwagę").click();
 await page.getByText("Skopiowano.").waitFor();
 const copied = await page.evaluate(() => navigator.clipboard.readText());
-check("feedback: the note is copied with the screen it was written on", copied.includes("Przycisk jest za mały") && copied.includes("ekran: /auth"), copied.slice(0, 80).replace(/\n/g, " "));
+check("feedback: …and can be copied instead", copied.includes("Druga uwaga") && copied.includes("ekran: /auth"), copied.slice(0, 60).replace(/\n/g, " "));
+check("feedback: no separate e-mail button", (await page.getByRole("link", { name: "E-mailem" }).count()) === 0);
 await btn("Zamknij").click();
 check("feedback: the tab stays out of the way on a phone", await (async () => {
   await p2.goto(`${BASE}/auth?mode=login`);

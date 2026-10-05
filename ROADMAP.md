@@ -46,7 +46,7 @@ Trzy zasady kolejności:
 - ✅ Wdrożenie na Vercel z repozytorium (każdy `git push` = nowa wersja).
 - ✅ Instalacja na ekranie telefonu jak aplikacja (ikona, nazwa, ekran startowy).
 - ✅ Licznik odwiedzin bez ciasteczek (po włączeniu Analytics w panelu Vercela).
-- ✅ Zakładka „UWAGI” na każdym ekranie (wysyłka przez udostępnianie w telefonie).
+- ✅ Zakładka „UWAGI” na każdym ekranie (uwaga przychodzi e-mailem do autorki).
 - Własna domena (opcjonalnie już teraz).
 - Test na prawdziwych telefonach: dźwięk, mikrofon, klawiatura, obrót ekranu.
 

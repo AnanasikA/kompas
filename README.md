@@ -56,9 +56,11 @@ Strona ma `noindex` (`app/layout.tsx`), żeby wersja pokazowa nie trafiła do Go
 - **Instalacja na telefonie:** `app/manifest.ts` + ikony w `public/icons`. Android/Chrome: menu →
   „Zainstaluj aplikację”; iPhone/Safari: Udostępnij → „Do ekranu początkowego”.
   Aplikacja nie działa jeszcze bez internetu (to Etap 05).
-- **Zakładka „UWAGI”** (`components/FeedbackTab.tsx`) jest na każdym ekranie. Tester wpisuje uwagę
-  i wysyła ją przez udostępnianie w telefonie (Messenger, WhatsApp, SMS) albo kopiuje; do treści
-  dołącza się ekran, tryb i urządzenie. Ustawienia w `data/site.ts` (wyłączenie, opcjonalny e-mail).
+- **Zakładka „UWAGI”** (`components/FeedbackTab.tsx`) jest na każdym ekranie. Tester wpisuje uwagę,
+  klika „Wyślij uwagę” i wiadomość przychodzi na adres z `data/site.ts` razem z ekranem, trybem
+  i urządzeniem. Wysyłka idzie przez FormSubmit (formsubmit.co), bo aplikacja nie ma jeszcze serwera.
+  **Jednorazowo:** pierwsza uwaga wysłana z danej strony nie dochodzi — FormSubmit wysyła wtedy
+  e-mail z linkiem „Activate”; po kliknięciu kolejne uwagi dochodzą normalnie.
 - **Statystyki odwiedzin:** `@vercel/analytics`, działa tylko na Vercelu i dopiero po kliknięciu
   **Enable** w zakładce Analytics projektu. Bez ciasteczek; pokazuje liczbę odwiedzin, strony,
   kraj i urządzenie — nie konkretne osoby.
