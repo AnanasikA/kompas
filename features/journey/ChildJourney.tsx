@@ -13,7 +13,7 @@ import { LevelProgram, LevelTabs } from "@/features/progress/LevelProgram";
 import { useLearner } from "@/features/progress/useLearner";
 import type { LessonState, UnitState } from "@/features/progress/units";
 import { AVATAR_COLORS, initialOf } from "@/features/theme/avatar";
-import { Compass, Prop, Ship, Waves, coast, islandProps, polyline, propSpots, themeOf, trail } from "./MapArt";
+import { Compass, Prop, Ship, Waves, coast, islandProps, islandTint, polyline, propSpots, themeOf, trail } from "./MapArt";
 import { cx, plural } from "@/lib/utils";
 import { isPlayable, lessonWords, missionKind, type CEFRLevel } from "@/types";
 
@@ -40,9 +40,6 @@ const WALK_STARTS = 750;
 const WALK_MS = 1000;
 const BUBBLE_MS = 3200;
 type StoneKind = "done" | "current" | "open" | "locked" | "planned";
-
-/** Island colours of the prototype map, reused in order. */
-const TINTS = ["oklch(0.90 0.08 145)", "oklch(0.92 0.08 85)", "oklch(0.90 0.05 305)", "oklch(0.91 0.05 35)", "oklch(0.94 0.06 95)"];
 
 function stoneKind(l: LessonState, nextId: string | undefined): StoneKind {
   if (l.status === "COMPLETED") return "done";
@@ -561,7 +558,7 @@ export function ChildJourney() {
               <Island
                 state={state}
                 index={i}
-                tint={TINTS[(levelIndex + i) % TINTS.length]}
+                tint={islandTint(levelIndex, i)}
                 isCurrent={state.unit.id === current?.unit.id}
                 nextId={nextId}
                 selection={selection}
@@ -576,7 +573,7 @@ export function ChildJourney() {
         </div>
 
         <aside aria-live="polite" className="sticky bottom-[96px] z-10 flex flex-col gap-4 lg:bottom-4 xl:top-5 xl:bottom-auto">
-          {wide && <LevelProgram level={level} />}
+          {wide && <LevelProgram level={level} compact />}
           {selectedUnit && selectedLesson ? <MissionPanel state={selectedUnit} lesson={selectedLesson} nextId={nextId} /> : selectedUnit ? <WorldPanel state={selectedUnit} isCurrent={selectedUnit.unit.id === current?.unit.id} /> : null}
         </aside>
       </div>

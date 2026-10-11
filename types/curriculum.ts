@@ -29,7 +29,7 @@ export type Colour = "red" | "blue" | "green" | "yellow" | "orange" | "pink" | "
 export type Feeling = "happy" | "sad" | "tired" | "hungry";
 export type TimeOfDay = "morning" | "afternoon" | "evening" | "night";
 export type Count = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-/** Pictures of the Home world (components/ui/HomeDrawings). */
+/** Pictures of the Home world (line icons, components/ui/LineIcon). */
 export type HomeThing =
   | "mum" | "dad" | "sister" | "brother" | "baby" | "grandma" | "grandpa"
   | "kitchen" | "bathroom" | "bedroom" | "living-room"

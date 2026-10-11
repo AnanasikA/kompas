@@ -4,6 +4,7 @@ import { childCourse } from "@/data/curriculum/child";
 import { helloWorld } from "@/data/curriculum/child/pre-a1/hello-world";
 import { home } from "@/data/curriculum/child/pre-a1/home";
 import { longestPath } from "@/features/learning/dialogue/engine";
+import { isLineIcon } from "@/components/ui/LineIcon";
 import { isPlayable, type Course, type Exercise, type Lesson } from "@/types";
 
 /**
@@ -89,6 +90,12 @@ describe.each(Object.values(COURSES))("$id course content", (course) => {
   it("every exercise can be solved", () => {
     const broken = lessons(course).flatMap((l) => l.exercises.flatMap((e) => problems(e).map((p) => `${e.id}: ${p}`)));
     expect(broken).toEqual([]);
+  });
+
+  it("every picture can be drawn", () => {
+    const images = lessons(course).flatMap((l) => l.exercises.flatMap((e) => ("options" in e ? e.options.flatMap((o) => ("image" in o && o.image ? [o.image as string] : [])) : [])));
+    const missing = images.filter((id) => !/^(colour|count)-/.test(id) && !isLineIcon(id.replace(/^(face|time|home)-/, "")));
+    expect(missing).toEqual([]);
   });
 
   it("every concept's practice check can be solved", () => {

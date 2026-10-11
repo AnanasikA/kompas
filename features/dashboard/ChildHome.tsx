@@ -7,14 +7,14 @@ import { useLearner } from "@/features/progress/useLearner";
 import { AVATAR_COLORS, initialOf } from "@/features/theme/avatar";
 import { cx, formatDuration, plural } from "@/lib/utils";
 import { isPlayable, missionKind } from "@/types";
-import { coast, PropAt, themeOf } from "@/features/journey/MapArt";
+import { coast, islandTint, PropAt, themeOf } from "@/features/journey/MapArt";
+import { Postcard } from "./Postcard";
 
-const POSTCARD_COLORS = ["var(--color-moss)", "var(--color-sky)", "var(--color-violet)", "var(--color-coral)", "var(--color-amber)"];
-const POSTCARD_TILT = ["-rotate-[4deg]", "rotate-3", "-rotate-2", "rotate-2"];
+const POSTCARD_TILT = ["-rotate-2", "rotate-[1.5deg]", "-rotate-1", "rotate-2"];
 
 export function ChildHome() {
   const data = useLearner();
-  const { user, level, rank, streak, goal, next, current, currentLevel, due, last, week, units, activity, now, course } = data;
+  const { user, level, rank, streak, goal, next, current, currentLevel, levels, due, last, week, units, activity, now, course } = data;
   const unit = next?.unit ?? current;
   const lesson = next?.lesson;
   const inProgress = lesson?.status === "IN_PROGRESS";
@@ -24,6 +24,10 @@ export function ChildHome() {
   const weak = due.filter((r) => r.status === "weak").length;
   const levelTitle = unit ? course.levels.find((l) => l.level === unit.unit.level)?.title : undefined;
   const completedUnits = units.filter((u) => u.status === "COMPLETED");
+  // Postcards: every world collected so far, the one in progress and the next one ahead.
+  const placed = levels.flatMap((l, levelIndex) => l.units.map((state, indexInLevel) => ({ state, levelIndex, indexInLevel })));
+  const currentAt = placed.findIndex((p) => p.state.unit.id === unit?.unit.id);
+  const postcards = placed.filter((p, i) => p.state.status === "COMPLETED" || (currentAt >= 0 && i >= currentAt && i <= currentAt + 1)).slice(-6);
 
   // Scene path: the three lessons before the current one, the current one, the two after it.
   const lessonList = unit?.lessons ?? [];
@@ -243,24 +247,21 @@ export function ChildHome() {
               Kolekcja · {completedUnits.length}/{units.length} →
             </Link>
           </div>
-          <ul className="m-0 flex list-none gap-3 overflow-x-auto px-0.5 pb-2.5 pt-1.5">
-            {[...completedUnits, ...(unit && unit.status !== "COMPLETED" ? [unit] : [])].slice(0, 6).map((u, i) => {
-              const done = u.status === "COMPLETED";
+          <ul className="m-0 flex list-none gap-4 overflow-x-auto px-1 pb-3 pt-2">
+            {postcards.map(({ state: u, levelIndex, indexInLevel }, i) => {
+              const state = u.status === "COMPLETED" ? "collected" : u.unit.id === unit?.unit.id ? "progress" : "ahead";
               return (
-                <li
-                  key={u.unit.id}
-                  className={cx(
-                    "relative flex h-[140px] w-[110px] shrink-0 flex-col justify-between rounded-xl p-2.5",
-                    POSTCARD_TILT[i % POSTCARD_TILT.length],
-                    done ? "shadow-[0_6px_14px_oklch(0.23_0.025_265/0.15)]" : "border-[3px] border-dashed border-[oklch(0.75_0.06_75)] bg-[oklch(0.96_0.03_85)]",
-                  )}
-                  style={done ? { background: POSTCARD_COLORS[i % POSTCARD_COLORS.length] } : undefined}
-                >
-                  {done ? <span className="h-[30px] w-[26px] self-end rounded-[3px] border-2 border-dashed border-ink/50" aria-hidden /> : <span className="font-mono text-[11px]">{u.percent}%</span>}
-                  <span className={cx("font-display text-[15px] font-extrabold leading-[1.05]", !done && "text-[oklch(0.48_0.11_65)]")}>
-                    {u.unit.title}
-                    <span className="sr-only">{done ? " — zdobyta" : " — w trakcie"}</span>
-                  </span>
+                <li key={u.unit.id}>
+                  <Postcard
+                    unitId={u.unit.id}
+                    title={u.unit.title}
+                    order={u.unit.order}
+                    level={u.unit.level}
+                    tint={islandTint(levelIndex, indexInLevel)}
+                    state={state}
+                    percent={u.percent}
+                    tilt={POSTCARD_TILT[i % POSTCARD_TILT.length]}
+                  />
                 </li>
               );
             })}
@@ -356,12 +357,7 @@ function IslandPreview({ unitId, slots, avatar }: { unitId: string; slots: (Slot
       ].map(([x, y]) => (
         <path key={x} d={`M${x} ${y} c6 -8 12 -8 18 0 c6 -8 12 -8 18 0`} fill="none" stroke="oklch(0.97 0.02 225 / 0.9)" strokeWidth={2.4} strokeLinecap="round" />
       ))}
-      <g transform="translate(330 34)">
-        <path d="M8 40 H56 L48 54 H16 Z" fill="oklch(0.55 0.08 55)" stroke="var(--color-ink)" strokeWidth={2.4} strokeLinejoin="round" />
-        <path d="M32 40 V8" stroke="var(--color-ink)" strokeWidth={3} />
-        <path d="M32 10 C44 14 46 28 34 36 Z M30 14 C20 18 18 30 30 36 Z" fill="oklch(0.98 0.01 85)" stroke="var(--color-ink)" strokeWidth={2.4} strokeLinejoin="round" />
-        <path d="M32 8 L42 4 L32 2 Z" fill="oklch(0.70 0.15 30)" />
-      </g>
+      <PropAt id="ship" x={362} y={92} size={60} />
       <PropAt id={first} x={96} y={214} size={84} />
       <PropAt id={second} x={500} y={200} size={72} />
       <PropAt id={third ?? "tree"} x={250} y={204} size={58} />

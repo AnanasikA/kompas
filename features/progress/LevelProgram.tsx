@@ -45,14 +45,14 @@ export function levelCopy(age: AgeGroup) {
   return age === "CHILD" ? COPY.pl : COPY.en;
 }
 
-function Meter({ label, value, target }: { label: string; value: number; target: number }) {
+function Meter({ label, value, target, compact }: { label: string; value: number; target: number; compact?: boolean }) {
   const age = useAge();
   const percent = target ? Math.min(100, Math.round((value / target) * 100)) : 0;
   return (
     <div className="flex min-w-0 flex-col gap-2">
       <dt className="font-mono text-[11px] uppercase tracking-[0.1em] text-[var(--k-muted)]">{label}</dt>
       <dd className="m-0 flex flex-col gap-2">
-        <span className={cx("leading-none", age === "ADULT" ? "font-serif text-[30px]" : age === "TEEN" ? "font-mono text-[22px]" : "font-display text-[28px] font-extrabold")}>
+        <span className={cx("whitespace-nowrap leading-none", age === "ADULT" ? "font-serif text-[30px]" : age === "TEEN" ? "font-mono text-[22px]" : compact ? "font-display text-[22px] font-extrabold" : "font-display text-[28px] font-extrabold")}>
           {value}
           <span className="text-[0.6em] font-normal text-[var(--k-muted)]"> / {target}</span>
         </span>
@@ -68,7 +68,8 @@ function Meter({ label, value, target }: { label: string; value: number; target:
   );
 }
 
-export function LevelProgram({ level, className }: { level: LevelState; className?: string }) {
+/** `compact`: a narrow column (the child map's right column) — smaller numbers so they stay on one line. */
+export function LevelProgram({ level, className, compact }: { level: LevelState; className?: string; compact?: boolean }) {
   const age = useAge();
   const t = levelCopy(age);
   const chip = cx(
@@ -100,9 +101,9 @@ export function LevelProgram({ level, className }: { level: LevelState; classNam
       </div>
 
       <dl className="m-0 grid grid-cols-3 gap-[clamp(12px,2vw,28px)]">
-        <Meter label={t.words} value={level.words.learned} target={level.words.target} />
-        <Meter label={t.grammar} value={level.grammarDone} target={level.grammar.length} />
-        <Meter label={MISSIONS[age]} value={level.missions.done} target={level.missions.total} />
+        <Meter label={t.words} value={level.words.learned} target={level.words.target} compact={compact} />
+        <Meter label={t.grammar} value={level.grammarDone} target={level.grammar.length} compact={compact} />
+        <Meter label={MISSIONS[age]} value={level.missions.done} target={level.missions.total} compact={compact} />
       </dl>
 
       <details className="group">
