@@ -18,14 +18,25 @@ type ChoiceEx = MultipleChoiceExercise | ImageChoiceExercise | ListeningExercise
 type Phase = "answering" | "correct" | "almost" | "revealed";
 type OptionState = "idle" | "selected" | "good" | "bad";
 
+/** Mistakes after which the answer is shown and the learner moves on. */
+const REVEAL_AFTER = 2;
+
+const REVEAL_TITLE: Record<AgeGroup, (answer: string) => string> = {
+  CHILD: (answer) => `Dobra odpowiedź: ${answer}`,
+  TEEN: (answer) => `Answer: ${answer}`,
+  ADULT: (answer) => `Poprawna odpowiedź: ${answer}`,
+};
+
 const REVIEW_NOTE: Record<AgeGroup, string> = {
   CHILD: "Dodaliśmy to do powtórek w Treningu.",
   TEEN: "ADDED TO PRACTICE",
   ADULT: "Dodano do powtórek.",
 };
 
+/** After a first mistake only the wrong pick is marked: the right answer is not given away. */
 function optionState(option: ChoiceOption, correctId: string, picked: string | null, phase: Phase): OptionState {
   if (phase === "answering") return picked === option.id ? "selected" : "idle";
+  if (phase === "almost") return option.id === picked ? "bad" : "idle";
   if (option.id === correctId) return "good";
   if (option.id === picked) return "bad";
   return "idle";
@@ -439,6 +450,8 @@ export function ChoiceExercise({ exercise, onMistake, onSolved, onContinue, show
   const options = exercise.options as ChoiceOption[];
   const states = options.map((o) => optionState(o, exercise.correctOptionId, picked, phase));
   const locked = phase !== "answering";
+  // The answer becomes visible only once the exercise is over (solved or shown after mistakes).
+  const settled = phase === "correct" || phase === "revealed";
   const pickedText = options.find((o) => o.id === picked)?.text ?? null;
   const correctText = options.find((o) => o.id === exercise.correctOptionId)?.text ?? null;
   const hasImages = options.some((o) => o.image);
@@ -450,10 +463,11 @@ export function ChoiceExercise({ exercise, onMistake, onSolved, onContinue, show
       onSolved();
       return;
     }
-    setMistakes((m) => m + 1);
+    const made = mistakes + 1;
+    setMistakes(made);
     setHint(result.hint);
     onMistake([result.conceptId]);
-    if (instant) {
+    if (instant || made >= REVEAL_AFTER) {
       setPhase("revealed");
       onSolved();
     } else {
@@ -482,12 +496,12 @@ export function ChoiceExercise({ exercise, onMistake, onSolved, onContinue, show
   const sheet = age === "CHILD";
 
   return (
-    <div className={cx("flex flex-col", age === "ADULT" ? "max-w-[720px] gap-7" : "gap-6", sheet && locked && "pb-[230px] sm:pb-[190px]")}>
-      {listening ? <ListeningHeader exercise={listening} clip={clip} revealed={locked} /> : <PromptHeader exercise={exercise as Exclude<ChoiceEx, ListeningExercise>} filled={exercise.type === "FILL_GAP" ? (phase === "answering" ? pickedText : correctText) : null} />}
+    <div className={cx("flex flex-col", age === "ADULT" ? "max-w-[720px] gap-7" : "gap-6", sheet && locked && "pb-[260px] sm:pb-[210px]")}>
+      {listening ? <ListeningHeader exercise={listening} clip={clip} revealed={settled} /> : <PromptHeader exercise={exercise as Exclude<ChoiceEx, ListeningExercise>} filled={exercise.type === "FILL_GAP" ? (settled ? correctText : pickedText) : null} />}
 
       <div role="radiogroup" aria-label={listening ? listening.question : "Odpowiedzi"}>
         {age === "CHILD" && (
-          <ChildOptions options={options} states={states} onPick={pick} disabled={locked} images={hasImages} revealLabels={locked} pills={exercise.type === "FILL_GAP"} />
+          <ChildOptions options={options} states={states} onPick={pick} disabled={locked} images={hasImages} revealLabels={settled} pills={exercise.type === "FILL_GAP"} />
         )}
         {age === "TEEN" && <TeenOptions options={options} states={states} onPick={pick} disabled={locked} />}
         {age === "ADULT" && <AdultOptions options={options} states={states} onPick={pick} disabled={locked} pills={exercise.type === "FILL_GAP"} />}
@@ -549,9 +563,19 @@ export function ChoiceExercise({ exercise, onMistake, onSolved, onContinue, show
         />
       )}
 
-      {phase === "revealed" && (
-        <Feedback kind="almost" title={exercise.feedback.incorrect.title} note={hint ?? exercise.feedback.incorrect.note} actions={next} />
-      )}
+      {phase === "revealed" &&
+        (instant ? (
+          <Feedback kind="almost" title={exercise.feedback.incorrect.title} note={hint ?? exercise.feedback.incorrect.note} actions={next} />
+        ) : (
+          <Feedback
+            kind="almost"
+            sheet={sheet}
+            title={REVEAL_TITLE[age](correctText ?? "")}
+            note={exercise.feedback.correct.note ?? exercise.feedback.incorrect.note}
+            footnote={showXp ? REVIEW_NOTE[age] : undefined}
+            actions={next}
+          />
+        ))}
     </div>
   );
 }

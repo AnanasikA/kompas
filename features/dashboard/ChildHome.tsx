@@ -6,7 +6,8 @@ import { lessonMaxXp } from "@/features/learning/engine/xp";
 import { useLearner } from "@/features/progress/useLearner";
 import { AVATAR_COLORS, initialOf } from "@/features/theme/avatar";
 import { cx, formatDuration, plural } from "@/lib/utils";
-import { isPlayable } from "@/types";
+import { isPlayable, missionKind } from "@/types";
+import { coast, PropAt, themeOf } from "@/features/journey/MapArt";
 
 const POSTCARD_COLORS = ["var(--color-moss)", "var(--color-sky)", "var(--color-violet)", "var(--color-coral)", "var(--color-amber)"];
 const POSTCARD_TILT = ["-rotate-[4deg]", "rotate-3", "-rotate-2", "rotate-2"];
@@ -28,6 +29,14 @@ export function ChildHome() {
   const lessonList = unit?.lessons ?? [];
   const at = lesson ? lessonList.findIndex((l) => l.lesson.id === lesson.lesson.id) : -1;
   const before = at > 0 ? lessonList.slice(Math.max(0, at - 3), at) : [];
+  const after = at >= 0 ? lessonList.slice(at + 1, at + 3) : [];
+  // Six places on the preview trail: three behind, the learner's mission, two ahead.
+  const slots: (Slot | undefined)[] = [
+    ...Array.from({ length: 3 - before.length }, () => undefined),
+    ...before.map((l) => ({ label: String(l.lesson.order), state: l.status === "COMPLETED" ? ("done" as const) : ("ahead" as const) })),
+    lesson ? { label: isPlayable(lesson.lesson) ? String(lesson.lesson.order) : "★", state: "current" as const } : undefined,
+    ...after.map((l) => ({ label: missionKind(l.lesson) === "CHECKPOINT" ? "★" : missionKind(l.lesson) === "REVIEW" ? "↻" : String(l.lesson.order), state: "ahead" as const })),
+  ];
 
   return (
     <div className="flex max-w-[1280px] flex-col gap-[26px] p-[clamp(20px,3vw,40px)]">
@@ -118,65 +127,12 @@ export function ChildHome() {
             href={continueHref}
             className="rounded-[20px] bg-ink px-3 py-5 text-center font-display text-[clamp(16px,5vw,22px)] font-extrabold tracking-[0.02em] text-on-ink shadow-[0_6px_0_var(--color-ink-deep)] transition-transform hover:bg-ink-soft active:translate-y-[5px] active:shadow-[0_1px_0_var(--color-ink-deep)]"
           >
-            {lesson ? "CONTINUE ADVENTURE →" : "OTWÓRZ MAPĘ →"}
+            {lesson ? "GRAJ DALEJ →" : "OTWÓRZ MAPĘ →"}
           </Link>
         </div>
 
         <Link href="/journey" aria-label="Otwórz mapę" className="relative hidden min-h-[400px] overflow-hidden bg-[oklch(0.86_0.06_225)] sm:block">
-          <span aria-hidden>
-            <span className="absolute -bottom-20 -left-10 h-[300px] w-[115%] rounded-[50%_50%_0_0] bg-[oklch(0.91_0.08_85)]" />
-            <span className="absolute -right-[60px] -top-[60px] size-[200px] rounded-full bg-[oklch(0.90_0.05_225)]" />
-            <span className="absolute bottom-[200px] left-[12%] h-[70px] w-[54px] rounded-t-md bg-coral" />
-            <span className="absolute bottom-[270px] left-[12%] h-[30px] w-[54px] bg-coral-deep" style={{ clipPath: "polygon(50% 0,100% 100%,0 100%)" }} />
-            <span className="absolute bottom-[200px] h-[100px] w-[70px] rounded-t-lg bg-violet" style={{ left: "calc(12% + 62px)" }} />
-            <span className="absolute bottom-[250px] size-[18px] rounded bg-[oklch(0.97_0.02_85)]" style={{ left: "calc(12% + 74px)" }} />
-            <span className="absolute bottom-[250px] size-[18px] rounded bg-[oklch(0.97_0.02_85)]" style={{ left: "calc(12% + 100px)" }} />
-            <span className="absolute bottom-[200px] right-[16%] h-[84px] w-[90px] rounded-t-lg bg-sky" />
-            <span
-              className="absolute bottom-[282px] h-[22px] w-[106px] rounded-md"
-              style={{ right: "calc(16% - 8px)", background: "repeating-linear-gradient(90deg,oklch(0.97 0.02 85) 0 14px,oklch(0.62 0.17 35) 14px 28px)" }}
-            />
-            <span className="absolute bottom-[200px] h-10 w-7 rounded-t-[14px] bg-ink" style={{ right: "calc(16% + 30px)" }} />
-            <span className="absolute bottom-[210px] right-[6%] size-[30px] rounded-full bg-[oklch(0.62_0.15_145)]" />
-            <span className="absolute bottom-[196px] h-[18px] w-1.5 bg-[oklch(0.45_0.06_60)]" style={{ right: "calc(6% + 12px)" }} />
-            <svg className="absolute inset-0 h-full w-full" viewBox="0 0 500 400" preserveAspectRatio="none">
-              <polyline points="30,370 110,330 190,350 270,300 350,330 420,290" fill="none" stroke="var(--color-ink)" strokeWidth="4" strokeDasharray="2 11" strokeLinecap="round" />
-            </svg>
-            {[
-              ["6%", "20px"],
-              ["22%", "58px"],
-              ["38%", "38px"],
-            ].map(([left, bottom], i) => {
-              const item = before[before.length - 3 + i];
-              const done = item?.status === "COMPLETED";
-              return (
-                <span
-                  key={left}
-                  className={cx(
-                    "absolute grid size-[34px] place-items-center rounded-full text-sm font-extrabold",
-                    done ? "bg-moss shadow-[0_4px_0_var(--color-moss-deep)]" : "border-[3px] border-dashed border-ink/40",
-                  )}
-                  style={{ left, bottom }}
-                >
-                  {done ? "✓" : ""}
-                </span>
-              );
-            })}
-            <span className="absolute bottom-[84px] left-[52%] size-[66px] rounded-full">
-              <span className="pointer-events-none absolute inset-0 animate-kpulse rounded-full bg-amber" />
-              <span className="absolute inset-0 grid place-items-center rounded-full bg-amber font-display text-2xl font-extrabold shadow-[0_6px_0_var(--color-amber-deep)]">
-                {lesson && isPlayable(lesson.lesson) ? lesson.lesson.order : "★"}
-              </span>
-            </span>
-            <span className="absolute bottom-[166px] flex flex-col items-center" style={{ left: "calc(52% + 12px)" }}>
-              <span className="grid size-[42px] place-items-center rounded-full font-display font-extrabold shadow-[0_0_0_3px_var(--color-card)]" style={{ background: AVATAR_COLORS[user.avatarColor] }}>
-                {initialOf(user.name)}
-              </span>
-              <span style={{ width: 0, height: 0, borderLeft: "7px solid transparent", borderRight: "7px solid transparent", borderTop: "9px solid oklch(0.995 0.004 85)" }} />
-            </span>
-            <span className="absolute bottom-[58px] left-[70%] size-[34px] rounded-full border-[3px] border-dashed border-ink/40" />
-            <span className="absolute bottom-24 left-[84%] size-[30px] rotate-45 border-[3px] border-dashed border-ink/40" />
-          </span>
+          <IslandPreview unitId={unit?.unit.id ?? "child"} slots={slots} avatar={{ color: AVATAR_COLORS[user.avatarColor], initial: initialOf(user.name) }} />
           <span className="absolute right-[18px] top-[18px] rounded-full bg-card px-3 py-[7px] font-mono text-xs">Otwórz mapę →</span>
         </Link>
       </div>
@@ -355,5 +311,102 @@ export function ChildHome() {
         </section>
       </div>
     </div>
+  );
+}
+
+type Slot = { label: string; state: "done" | "current" | "ahead" };
+
+/** Where the six stones of the preview lie, on a 600×400 drawing. */
+const SLOT_AT = [
+  { x: 70, y: 336 },
+  { x: 150, y: 290 },
+  { x: 228, y: 330 },
+  { x: 312, y: 268 },
+  { x: 404, y: 316 },
+  { x: 488, y: 272 },
+];
+const TRAIL = "M-10,360 C30,350 46,340 70,336 S124,292 150,290 S204,334 228,330 S284,270 312,268 S378,320 404,316 S464,274 488,272 S560,250 620,240";
+
+/** The learner's island in the treasure-map style of the map: their world's things and the next few missions. */
+function IslandPreview({ unitId, slots, avatar }: { unitId: string; slots: (Slot | undefined)[]; avatar: { color: string; initial: string } }) {
+  const [first, second, third] = themeOf(unitId);
+  const current = slots.findIndex((s) => s?.state === "current");
+  const firstWalked = slots.findIndex((s) => s);
+  const pin = SLOT_AT[current >= 0 ? current : 3];
+  return (
+    <svg aria-hidden className="absolute inset-0 h-full w-full" viewBox="0 0 600 400" preserveAspectRatio="xMidYMax slice">
+      <defs>
+        <pattern id="home-sea" width="22" height="22" patternUnits="userSpaceOnUse">
+          <circle cx="11" cy="11" r="1.3" fill="oklch(0.80 0.06 225)" />
+        </pattern>
+        <clipPath id="home-walked">
+          <rect x={SLOT_AT[Math.max(0, firstWalked)].x} y="0" width={Math.max(0, pin.x - SLOT_AT[Math.max(0, firstWalked)].x)} height="400" />
+        </clipPath>
+      </defs>
+      <rect width="600" height="400" fill="url(#home-sea)" />
+      <g transform="translate(-40 92)">
+        <path d={coast(unitId, 680, 380, -6)} fill="oklch(0.92 0.035 215)" />
+        <path d={coast(unitId, 680, 380, 2)} fill="oklch(0.90 0.055 85)" stroke="oklch(0.50 0.06 60)" strokeWidth={2.5} />
+        <path d={coast(`${unitId}.land`, 680, 380, 13)} fill="oklch(0.88 0.08 145)" />
+      </g>
+      {[
+        [40, 40],
+        [250, 64],
+        [130, 100],
+      ].map(([x, y]) => (
+        <path key={x} d={`M${x} ${y} c6 -8 12 -8 18 0 c6 -8 12 -8 18 0`} fill="none" stroke="oklch(0.97 0.02 225 / 0.9)" strokeWidth={2.4} strokeLinecap="round" />
+      ))}
+      <g transform="translate(330 34)">
+        <path d="M8 40 H56 L48 54 H16 Z" fill="oklch(0.55 0.08 55)" stroke="var(--color-ink)" strokeWidth={2.4} strokeLinejoin="round" />
+        <path d="M32 40 V8" stroke="var(--color-ink)" strokeWidth={3} />
+        <path d="M32 10 C44 14 46 28 34 36 Z M30 14 C20 18 18 30 30 36 Z" fill="oklch(0.98 0.01 85)" stroke="var(--color-ink)" strokeWidth={2.4} strokeLinejoin="round" />
+        <path d="M32 8 L42 4 L32 2 Z" fill="oklch(0.70 0.15 30)" />
+      </g>
+      <PropAt id={first} x={96} y={214} size={84} />
+      <PropAt id={second} x={500} y={200} size={72} />
+      <PropAt id={third ?? "tree"} x={250} y={204} size={58} />
+      <path d={TRAIL} fill="none" stroke="oklch(0.23 0.025 265 / 0.3)" strokeWidth={4} strokeDasharray="9 9" strokeLinecap="round" />
+      {firstWalked >= 0 && firstWalked < current && <path d={TRAIL} clipPath="url(#home-walked)" fill="none" stroke="var(--color-ink)" strokeWidth={5} strokeDasharray="9 9" strokeLinecap="round" />}
+      {slots.map((slot, i) => {
+        if (!slot) return null;
+        const { x, y } = SLOT_AT[i];
+        if (slot.state === "current") {
+          return (
+            <g key={i}>
+              <circle cx={x} cy={y} r={33} fill="var(--color-amber)" className="animate-kpulse" style={{ transformBox: "fill-box", transformOrigin: "center" }} />
+              <circle cx={x} cy={y + 6} r={33} fill="var(--color-amber-deep)" />
+              <circle cx={x} cy={y} r={33} fill="var(--color-amber)" />
+              <text x={x} y={y + 9} textAnchor="middle" fontSize="26" fontWeight="800" fontFamily="var(--font-display)" fill="var(--color-ink)">
+                {slot.label}
+              </text>
+            </g>
+          );
+        }
+        if (slot.state === "done") {
+          return (
+            <g key={i}>
+              <circle cx={x} cy={y + 4} r={22} fill="var(--color-moss-deep)" />
+              <circle cx={x} cy={y} r={22} fill="var(--color-moss)" />
+              <path d={`M${x - 8} ${y} l6 6 l11 -12`} fill="none" stroke="var(--color-ink)" strokeWidth={3.2} strokeLinecap="round" strokeLinejoin="round" />
+            </g>
+          );
+        }
+        return (
+          <g key={i}>
+            <circle cx={x} cy={y} r={21} fill="oklch(0.97 0.01 85)" stroke="oklch(0.62 0.02 85)" strokeWidth={3} strokeDasharray="5 4" />
+            <text x={x} y={y + 6} textAnchor="middle" fontSize="16" fontWeight="800" fontFamily="var(--font-display)" fill="oklch(0.50 0.02 265)">
+              {slot.label}
+            </text>
+          </g>
+        );
+      })}
+      <g transform={`translate(${pin.x} ${pin.y - 92})`}>
+        <circle r={22} fill={avatar.color} stroke="var(--color-card)" strokeWidth={3} />
+        <text y={7} textAnchor="middle" fontSize="18" fontWeight="800" fontFamily="var(--font-display)" fill="var(--color-ink)">
+          {avatar.initial}
+        </text>
+        <path d="M-7 24 L7 24 L0 33 Z" fill="var(--color-card)" />
+      </g>
+    </svg>
   );
 }

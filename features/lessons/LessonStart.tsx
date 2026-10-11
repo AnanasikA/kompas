@@ -7,7 +7,8 @@ import { useAge } from "@/features/theme/AgeScope";
 import { useAppStore } from "@/lib/store/app-store";
 import { cx, plural } from "@/lib/utils";
 import type { Lesson, Skill } from "@/types";
-import { exerciseName, lessonSkills, lessonTypes, skillCode, skillName } from "./labels";
+import { childStepLabel, exerciseName, lessonSkills, lessonTypes, skillCode, skillName } from "./labels";
+import { lessonScene, sceneColours, withName } from "./scenes";
 import { useLessonContext } from "./useLessonContext";
 
 const CHIP_COLORS = ["bg-amber-soft", "bg-sky-soft", "bg-violet-soft", "bg-moss-soft"];
@@ -19,14 +20,17 @@ const SKILL_TILE: Record<Skill, string> = {
   READING: "rounded-[14px] bg-violet-soft",
 };
 
-function CafeArt({ lesson }: { lesson: Lesson }) {
-  const dialogue = lesson.exercises.find((e) => e.type === "DIALOGUE");
-  const board = dialogue?.type === "DIALOGUE" ? dialogue.scene.board : undefined;
-  const firstLine = dialogue?.type === "DIALOGUE" ? dialogue.script.nodes[dialogue.script.startNodeId].line : null;
+/** Child-mode lesson art: the place of the lesson's scene, its character and their first line. */
+function SceneArt({ lesson, learnerName }: { lesson: Lesson; learnerName: string | null | undefined }) {
+  const dialogue = lessonScene(lesson);
+  const colours = sceneColours(dialogue);
+  const board = dialogue?.scene.board;
+  const firstLine = dialogue ? withName(dialogue.script.nodes[dialogue.script.startNodeId].line, learnerName) : null;
+  const cafe = (dialogue?.scene.setting ?? "cafe") === "cafe";
   return (
-    <div className="relative min-h-[320px] overflow-hidden rounded-[40px_40px_12px_40px] bg-[oklch(0.88_0.05_60)] lg:min-h-[440px]" aria-hidden>
-      <div className="absolute inset-x-0 bottom-0 h-[38%] bg-[oklch(0.55_0.08_55)]" />
-      <div className="absolute inset-x-0 bottom-[38%] h-[22px] bg-[oklch(0.45_0.07_50)]" />
+    <div className="relative min-h-[390px] overflow-hidden rounded-[40px_40px_12px_40px] lg:min-h-[440px]" style={{ background: colours.wall }} aria-hidden>
+      <div className="absolute inset-x-0 bottom-0 h-[38%]" style={{ background: colours.floor }} />
+      <div className="absolute inset-x-0 bottom-[38%] h-[22px]" style={{ background: colours.edge }} />
       {board && (
         <div className="absolute left-[6%] top-[10%] flex w-[52%] flex-col gap-1.5 rounded-xl bg-[oklch(0.28_0.03_160)] p-3 font-mono text-[11px] text-[oklch(0.95_0.02_100)] sm:left-[8%] sm:top-[12%] sm:w-[44%] sm:p-4 sm:text-xs">
           <div className="font-display text-lg font-extrabold text-[oklch(0.85_0.12_85)]">{board.title}</div>
@@ -38,19 +42,34 @@ function CafeArt({ lesson }: { lesson: Lesson }) {
           ))}
         </div>
       )}
-      <div className="absolute bottom-[38%] right-[14%] h-[150px] w-[130px] rounded-t-[65px] bg-sky" />
+      {!board && dialogue && (
+        <div className="absolute left-[8%] top-[12%] flex flex-col gap-1">
+          <span className="font-mono text-xs uppercase tracking-[0.12em] text-[oklch(0.40_0.03_265)]">{dialogue.scene.title}</span>
+          <span className="font-display text-[clamp(56px,8vw,96px)] font-extrabold leading-none text-[oklch(1_0_0/0.75)]">{lesson.kind ? "★" : lesson.order}</span>
+        </div>
+      )}
+      <div className="absolute bottom-[38%] right-[14%] h-[150px] w-[130px] rounded-t-[65px]" style={{ background: colours.body }} />
       <div className="absolute size-20 rounded-full bg-[oklch(0.78_0.07_55)]" style={{ right: "calc(14% + 25px)", bottom: "calc(38% + 130px)" }} />
       <div className="absolute h-[30px] w-[90px] rounded-[45px_45px_6px_6px] bg-[oklch(0.30_0.04_50)]" style={{ right: "calc(14% + 20px)", bottom: "calc(38% + 190px)" }} />
+      {dialogue && (
+        <div className="absolute rounded-full bg-card px-3 py-1.5 font-mono text-xs" style={{ right: "calc(14% + 10px)", bottom: "calc(38% - 44px)" }}>
+          {dialogue.script.character.name}
+        </div>
+      )}
       {firstLine && (
         <div
-          className="absolute hidden rounded-[18px_18px_4px_18px] bg-card px-4 py-3 font-display text-[17px] font-semibold shadow-[0_8px_20px_oklch(0.23_0.025_265/0.15)] sm:block"
+          className="absolute hidden max-w-[46%] rounded-[18px_18px_4px_18px] bg-card px-4 py-3 font-display text-[17px] font-semibold shadow-[0_8px_20px_oklch(0.23_0.025_265/0.15)] sm:block"
           style={{ right: "calc(14% + 145px)", bottom: "calc(38% + 160px)" }}
         >
           {firstLine}
         </div>
       )}
-      <div className="absolute left-[12%] hidden h-[50px] w-11 rounded-b-[18px] bg-[oklch(0.97_0.01_85)] lg:block" style={{ bottom: "calc(38% + 22px)" }} />
-      <div className="absolute hidden h-[34px] w-[60px] rounded-[30px_30px_4px_4px] bg-[oklch(0.80_0.10_75)] lg:block" style={{ left: "calc(12% + 52px)", bottom: "calc(38% + 22px)" }} />
+      {cafe && (
+        <>
+          <div className="absolute left-[12%] hidden h-[50px] w-11 rounded-b-[18px] bg-[oklch(0.97_0.01_85)] lg:block" style={{ bottom: "calc(38% + 22px)" }} />
+          <div className="absolute hidden h-[34px] w-[60px] rounded-[30px_30px_4px_4px] bg-[oklch(0.80_0.10_75)] lg:block" style={{ left: "calc(12% + 52px)", bottom: "calc(38% + 22px)" }} />
+        </>
+      )}
     </div>
   );
 }
@@ -60,6 +79,7 @@ export function LessonStart({ lessonId }: { lessonId: string }) {
   const age = useAge();
   const router = useRouter();
   const beginLesson = useAppStore((s) => s.beginLesson);
+  const learnerName = useAppStore((s) => s.user?.name);
   const { lesson, unit, lessonState, progress, due } = useLessonContext(lessonId);
 
   if (!lesson || !unit) {
@@ -225,15 +245,15 @@ export function LessonStart({ lessonId }: { lessonId: string }) {
           ← {unit.title}
         </Link>
         <div className="font-mono text-xs uppercase text-muted">
-          LESSON {lesson.order} · {unit.title}
+          {childStepLabel(lesson)} · {unit.title}
         </div>
       </div>
       <div className="mx-auto grid grid-cols-1 w-full max-w-[1280px] flex-1 items-stretch gap-6 px-[clamp(20px,3vw,40px)] pb-10 lg:grid-cols-2">
-        <CafeArt lesson={lesson} />
+        <SceneArt lesson={lesson} learnerName={learnerName} />
         <div className="flex flex-col justify-center gap-[22px]">
           <div className="flex flex-col gap-2.5">
             <div className="flex flex-wrap gap-2">
-              <span className="rounded-md bg-ink px-2.5 py-1.5 font-mono text-xs text-amber">LESSON {lesson.order}</span>
+              <span className="rounded-md bg-ink px-2.5 py-1.5 font-mono text-xs uppercase text-amber">{childStepLabel(lesson)}</span>
               <span className="rounded-md bg-sand px-2.5 py-1.5 font-mono text-xs">
                 {tasks + 1} {plural(tasks + 1, "krok", "kroki", "kroków")} · ~{lesson.estimatedMinutes} min
               </span>
@@ -277,14 +297,14 @@ export function LessonStart({ lessonId }: { lessonId: string }) {
             </p>
           )}
           {locked ? (
-            <p className="m-0 rounded-[20px] bg-idle p-5 text-center font-display text-lg font-extrabold text-[oklch(0.50_0.015_265)]">Najpierw ukończ poprzednią lekcję</p>
+            <p className="m-0 rounded-[20px] bg-idle p-5 text-center font-display text-lg font-extrabold text-[oklch(0.50_0.015_265)]">Najpierw ukończ poprzednią misję</p>
           ) : (
             <div className="flex flex-col gap-2.5">
               <Link
                 href={play}
                 className="rounded-[20px] bg-moss p-5 text-center font-display text-[22px] font-extrabold shadow-[0_6px_0_var(--color-moss-deep)] transition-transform active:translate-y-[5px] active:shadow-[0_1px_0_var(--color-moss-deep)]"
               >
-                {resuming ? `KONTYNUUJ · ZADANIE ${(progress?.currentIndex ?? 0) + 1} →` : done ? "POWTÓRZ LEKCJĘ →" : "START LESSON →"}
+                {resuming ? `KONTYNUUJ · ZADANIE ${(progress?.currentIndex ?? 0) + 1} →` : done ? "ZAGRAJ JESZCZE RAZ →" : "ZACZNIJ →"}
               </Link>
               {resuming && (
                 <button type="button" onClick={restart} className="self-center rounded-lg px-3 py-2 text-sm font-semibold text-muted hover:bg-sand">

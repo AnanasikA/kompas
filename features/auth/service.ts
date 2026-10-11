@@ -4,7 +4,7 @@ import type { AppStateRepository, AuthRepository } from "@/lib/persistence";
 import { hashPassword } from "@/lib/services/hash";
 import { uid } from "@/lib/utils";
 import { initialState } from "@/lib/store/initial";
-import { buildDemoState, findDemoByEmail, findDemoById } from "./demo";
+import { buildDemoState, findDemoByEmail, findDemoById, isCurrentDemoState } from "./demo";
 
 /**
  * ACCOUNTS ON THIS DEVICE
@@ -42,7 +42,8 @@ export async function signIn(deps: AuthDeps, emailInput: string, password: strin
   const demo = findDemoByEmail(email);
   if (demo) {
     if (password !== DEMO_PASSWORD) return { ok: false, reason: "WRONG_PASSWORD" };
-    const state = (await deps.states.load(demo.id)) ?? buildDemoState(demo, now);
+    const saved = await deps.states.load(demo.id);
+    const state = saved && isCurrentDemoState(demo, saved) ? saved : buildDemoState(demo, now);
     await deps.states.save(demo.id, state);
     await deps.auth.setSession(demo.id);
     return { ok: true, state };
@@ -66,9 +67,13 @@ export async function restoreSession(deps: AuthDeps, now: Date): Promise<AppStat
   const accountId = await deps.auth.getSession();
   if (!accountId) return null;
   const saved = await deps.states.load(accountId);
-  if (saved) return saved;
   const demo = findDemoById(accountId);
-  if (demo) return buildDemoState(demo, now);
+  if (demo && !(saved && isCurrentDemoState(demo, saved))) {
+    const fresh = buildDemoState(demo, now);
+    await deps.states.save(demo.id, fresh);
+    return fresh;
+  }
+  if (saved) return saved;
   await deps.auth.setSession(null);
   return null;
 }

@@ -27,6 +27,11 @@ export interface DemoAccount {
   dailyGoal: number;
   goals: string[];
   focus: string[];
+  /**
+   * Raise it to start the account from scratch on every device once — e.g.
+   * when it should open on new content. Progress of an older edition is replaced.
+   */
+  edition: number;
 }
 
 export const DEMO_ACCOUNTS: DemoAccount[] = [
@@ -38,10 +43,12 @@ export const DEMO_ACCOUNTS: DemoAccount[] = [
     range: "8–12",
     name: "Zosia",
     age: 10,
-    level: "A1",
+    // Starts at the very beginning of the path: the Hello World world.
+    level: "Pre-A1",
     dailyGoal: 10,
     goals: ["animals", "games"],
     focus: [],
+    edition: 2,
   },
   {
     id: "demo-teen",
@@ -55,6 +62,7 @@ export const DEMO_ACCOUNTS: DemoAccount[] = [
     dailyGoal: 10,
     goals: ["travel", "games"],
     focus: ["Speaking"],
+    edition: 1,
   },
   {
     id: "demo-adult",
@@ -68,5 +76,6 @@ export const DEMO_ACCOUNTS: DemoAccount[] = [
     dailyGoal: 15,
     goals: ["Travel", "Work"],
     focus: ["Speaking", "Listening"],
+    edition: 1,
   },
 ];

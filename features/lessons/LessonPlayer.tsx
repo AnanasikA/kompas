@@ -10,6 +10,7 @@ import { useSkin } from "@/features/theme/useSkin";
 import { useAppStore } from "@/lib/store/app-store";
 import { cx } from "@/lib/utils";
 import { ExerciseRenderer } from "./exercises/ExerciseRenderer";
+import { childStepLabel } from "./labels";
 import { QuitDialog } from "./QuitDialog";
 import { useLessonContext } from "./useLessonContext";
 
@@ -129,7 +130,7 @@ export function LessonPlayer({ lessonId }: { lessonId: string }) {
           {age !== "ADULT" && (
             <div className={cx("flex justify-between", age === "CHILD" ? "text-[13px] font-bold" : "font-mono text-[11px] tracking-[0.08em]")}>
               <span className={cx("truncate", age === "TEEN" && "text-grape")}>
-                {age === "CHILD" ? `Lesson ${lesson.order} · ${unit?.title}` : `MISSION ${String(lesson.order).padStart(2, "0")} / ${unit?.title}`}
+                {age === "CHILD" ? `${childStepLabel(lesson)} · ${unit?.title}` : `MISSION ${String(lesson.order).padStart(2, "0")} / ${unit?.title}`}
               </span>
               <span className={age === "CHILD" ? "font-mono font-medium" : undefined}>
                 {index + 1}/{steps}

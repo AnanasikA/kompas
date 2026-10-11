@@ -1,6 +1,8 @@
 import type { Course, Unit } from "@/types";
 import { buildUnit, checkpoint, review, untitled, type MissionSpec } from "../helpers";
 import { foodConcepts, foodTown } from "./a1/food";
+import { helloWorld, helloWorldConcepts } from "./pre-a1/hello-world";
+import { home, homeConcepts } from "./pre-a1/home";
 
 /**
  * CHILD course ("Explorer"): worlds from Pre-A1 to B2.
@@ -9,6 +11,8 @@ import { foodConcepts, foodTown } from "./a1/food";
  * numbered path of missions. A world ends with a review and a challenge.
  * Mission titles are written for Pre-A1 and A1; later levels have their
  * worlds, word targets and grammar set, and wait for titles and content.
+ * Written in full so far: Hello World (pre-a1/hello-world.ts), Home
+ * (pre-a1/home.ts) and one Food Town mission (a1/food.ts).
  */
 
 interface WorldSpec {
@@ -54,24 +58,8 @@ export const childCourse: Course = {
   ],
   units: [
     /* ---------- Pre-A1 · 200 words ---------- */
-    world({
-      id: "hello-world", topic: "family",
-      level: "Pre-A1",
-      title: "Hello World",
-      canDo: "Witasz się i przedstawiasz",
-      words: 100,
-      grammar: ["pa1.be", "pa1.articles-plurals", "pa1.imperatives"],
-      missions: ["Hello!", "What's your name?", "Numbers 1–10", "Colours", "How are you?", "How old are you?", "Numbers 11–20", "Days of the week", "Stand up, sit down", "Goodbye!"],
-    }),
-    world({
-      id: "home", topic: "home",
-      level: "Pre-A1",
-      title: "Home",
-      canDo: "Nazywasz rzeczy w domu i rodzinę",
-      words: 100,
-      grammar: ["pa1.this-that", "pa1.have-got", "pa1.can"],
-      missions: ["My family", "This is my mum", "Rooms", "In my room", "Toys", "I have got…", "Pets", "I can jump", "Clothes", "Where is it?"],
-    }),
+    placed(helloWorld),
+    placed(home),
 
     /* ---------- A1 · 400 words ---------- */
     world({
@@ -142,5 +130,5 @@ export const childCourse: Course = {
     world({ id: "wish-mountain", level: "B2", title: "Wish Mountain", canDo: "Mówisz o życzeniach i o tym, czego żałujesz", words: 150, grammar: ["b2.wish"], missions: 12 }),
     world({ id: "world-explorer", level: "B2", title: "World Explorer", canDo: "Swobodnie rozmawiasz o wszystkim", words: 150, grammar: ["b2.linking", "b2.phrasal-verbs"], missions: 12 }),
   ],
-  concepts: Object.fromEntries(foodConcepts.map((c) => [c.id, c])),
+  concepts: Object.fromEntries([...helloWorldConcepts, ...homeConcepts, ...foodConcepts].map((c) => [c.id, c])),
 };

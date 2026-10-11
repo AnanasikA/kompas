@@ -85,7 +85,7 @@ async function phonePass(tag, storageState, paths) {
   check("teen: dark Player home, next mission from data", await page.getByRole("heading", { name: "Flight delayed" }).isVisible());
   await shot(page, "t-04-home");
   await page.getByRole("link", { name: /Journey/ }).first().click();
-  await page.waitForURL("**/journey");
+  await page.waitForURL(/\/journey/);
   check("teen: opens on the level set by calibration", (await page.getByRole("tab", { name: /^A2/ }).getAttribute("aria-selected")) === "true");
   check("teen: A1 passed in calibration", /✓/.test(await page.getByRole("tab", { name: /^A1/ }).innerText()));
   check("teen: A2 program is 600 words over 48 missions", (await page.getByText("/ 600").first().isVisible()) && (await page.getByText("/ 48").first().isVisible()));
@@ -178,7 +178,7 @@ async function phonePass(tag, storageState, paths) {
   check("adult: calm Navigator home with a name from the e-mail", await page.getByRole("heading", { name: /, Anna\./ }).isVisible());
   await shot(page, "a-04-home");
   await page.getByRole("link", { name: "Ścieżka" }).click();
-  await page.waitForURL("**/journey");
+  await page.waitForURL(/\/journey/);
   await shot(page, "a-05-path");
   await page.getByRole("link", { name: /Open: Hotel check-in/ }).click();
   await page.waitForURL("**/lesson/adult.hotels.check-in");
@@ -257,12 +257,12 @@ async function phonePass(tag, storageState, paths) {
   check("child: skipping the test uses the self-assessment", await page.getByText(/na podstawie Twojej oceny/i).isVisible());
   await noOverflow(page, "child result");
   await shot(page, "m-child-03-result");
-  await btn(page, "START ADVENTURE →").click();
+  await btn(page, "RUSZAMY →").click();
   await page.waitForURL("**/home");
   await noOverflow(page, "child home");
   await shot(page, "m-child-04-home");
   await page.getByRole("link", { name: /Podróż/ }).click();
-  await page.waitForURL("**/journey");
+  await page.waitForURL(/\/journey/);
   await noOverflow(page, "child journey");
   await shot(page, "m-child-05-journey");
   await page.getByRole("region", { name: "Food Town", exact: true }).getByRole("button", { name: /słów/ }).click();
@@ -273,7 +273,7 @@ async function phonePass(tag, storageState, paths) {
   await page.getByRole("link", { name: /LEKCJA 7/ }).click();
   await noOverflow(page, "child lesson start");
   await shot(page, "m-child-07-lesson-start");
-  await page.getByRole("link", { name: "START LESSON →" }).click();
+  await page.getByRole("link", { name: "ZACZNIJ →" }).click();
   await page.getByRole("heading", { name: "Połącz pary ze słowami z kawiarni" }).waitFor();
   await noOverflow(page, "matching");
   await shot(page, "m-child-08-matching");
@@ -283,28 +283,28 @@ async function phonePass(tag, storageState, paths) {
   }
   await btn(page, "Dalej →").click();
   await page.getByRole("radio", { name: "Obrazek 1" }).click();
-  await btn(page, "CHECK →").click();
+  await btn(page, "SPRAWDŹ →").click();
   await page.waitForTimeout(500);
   await noOverflow(page, "image choice feedback");
   await shot(page, "m-child-09-image-almost");
   check("child phone: feedback sheet does not hide the retry button", await btn(page, "Spróbuj ponownie").isVisible());
   await btn(page, "Spróbuj ponownie").click();
   await page.getByRole("radio", { name: "Obrazek 3" }).click();
-  await btn(page, "CHECK →").click();
+  await btn(page, "SPRAWDŹ →").click();
   await btn(page, "Dalej →").click();
   await noOverflow(page, "listening");
   await shot(page, "m-child-10-listening");
   await page.getByRole("radio", { name: "Obrazek 2" }).click();
-  await btn(page, "CHECK →").click();
+  await btn(page, "SPRAWDŹ →").click();
   await btn(page, "Dalej →").click();
   for (const w of ["I'd", "like", "a", "hot", "chocolate,", "please."]) await page.getByRole("group", { name: "Słowa do wyboru" }).getByRole("button", { name: w, exact: true }).click();
   await noOverflow(page, "sentence builder");
   await shot(page, "m-child-11-sentence");
-  await btn(page, "CHECK →").click();
+  await btn(page, "SPRAWDŹ →").click();
   await btn(page, "Dalej →").click();
   await page.getByRole("radio", { name: "Can" }).click();
   await shot(page, "m-child-12-gap");
-  await btn(page, "CHECK →").click();
+  await btn(page, "SPRAWDŹ →").click();
   await btn(page, "Dalej →").click();
   await noOverflow(page, "speaking");
   await shot(page, "m-child-13-speaking");
@@ -321,8 +321,8 @@ async function phonePass(tag, storageState, paths) {
   await page.getByRole("heading", { name: "Level 2 odblokowany!" }).waitFor();
   await noOverflow(page, "reward");
   await shot(page, "m-child-16-reward");
-  await btn(page, "Wróć do bazy →").click();
-  await page.waitForURL("**/home");
+  await btn(page, "Dalej na mapę →").click();
+  await page.waitForURL(/\/journey/);
   for (const [name, path] of [["practice", "/practice"], ["me", "/me"], ["settings", "/settings"], ["parent", "/parent"]]) {
     await page.goto(`${BASE}${path}`);
     await page.waitForLoadState("networkidle");

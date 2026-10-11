@@ -75,7 +75,7 @@ const COPY: Record<AgeGroup, Record<string, string>> = {
  * Without it (or without a microphone): listen to the model and confirm yourself.
  * A failed recognition is not counted as a learner mistake — the recogniser may be at fault.
  */
-export function SpeakingExercise({ exercise, onSolved, onContinue, showXp }: ExerciseViewProps<SpeakingEx>) {
+export function SpeakingExercise({ exercise, onSolved, onContinue, showXp, continueLabel }: ExerciseViewProps<SpeakingEx>) {
   const age = useAge();
   const skin = useSkin();
   const t = COPY[age];
@@ -215,7 +215,7 @@ export function SpeakingExercise({ exercise, onSolved, onContinue, showXp }: Exe
         <div role="status" className={cx("flex w-full animate-kfade flex-wrap items-center justify-between gap-4 text-left", age === "CHILD" ? "rounded-3xl bg-moss-soft px-6 py-5" : cx(skin.okPanel, "px-5 py-[18px]"))}>
           <p className={cx("m-0", age === "CHILD" ? "font-display text-xl font-extrabold text-moss-ink" : skin.okText)}>✓ {t.confirmed}</p>
           <button type="button" onClick={onContinue} className={skin.primary} autoFocus>
-            {skin.t.next}
+            {continueLabel ?? skin.t.next}
           </button>
         </div>
       )}
@@ -293,7 +293,7 @@ export function SpeakingExercise({ exercise, onSolved, onContinue, showXp }: Exe
             </button>
             {result.correct ? (
               <button type="button" onClick={onContinue} className={skin.primary} autoFocus>
-                {skin.t.next}
+                {continueLabel ?? skin.t.next}
               </button>
             ) : (
               <button type="button" onClick={selfReport} className={skin.secondary}>

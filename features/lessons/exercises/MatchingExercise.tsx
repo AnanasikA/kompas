@@ -17,7 +17,7 @@ function shuffled<T extends { id: string }>(items: T[]): T[] {
   return [...items].sort((a, b) => weight(a.id) - weight(b.id));
 }
 
-export function MatchingExercise({ exercise, onMistake, onSolved, onContinue, showXp }: ExerciseViewProps<MatchingEx>) {
+export function MatchingExercise({ exercise, onMistake, onSolved, onContinue, showXp, continueLabel }: ExerciseViewProps<MatchingEx>) {
   const age = useAge();
   const skin = useSkin();
   const [left, setLeft] = useState<string | null>(null);
@@ -138,7 +138,7 @@ export function MatchingExercise({ exercise, onMistake, onSolved, onContinue, sh
           xp={showXp ? xpForExercise(exercise, { mistakes, skipped: false }) : null}
           actions={
             <button type="button" onClick={onContinue} className={cx(skin.primary, "text-center")} autoFocus>
-              {skin.t.next}
+              {continueLabel ?? skin.t.next}
             </button>
           }
         />

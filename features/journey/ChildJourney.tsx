@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Check, RotateCw, Star } from "lucide-react";
 import { LockIcon } from "@/components/ui/icons";
 import { getGrammarTopic } from "@/data/cefr/program";
@@ -12,6 +13,7 @@ import { LevelProgram, LevelTabs } from "@/features/progress/LevelProgram";
 import { useLearner } from "@/features/progress/useLearner";
 import type { LessonState, UnitState } from "@/features/progress/units";
 import { AVATAR_COLORS, initialOf } from "@/features/theme/avatar";
+import { Compass, Prop, Ship, Waves, coast, islandProps, polyline, propSpots, themeOf, trail } from "./MapArt";
 import { cx, plural } from "@/lib/utils";
 import { isPlayable, lessonWords, missionKind, type CEFRLevel } from "@/types";
 
@@ -25,11 +27,22 @@ import { isPlayable, lessonWords, missionKind, type CEFRLevel } from "@/types";
  */
 
 type Selection = { unitId: string; lessonId?: string };
+
+/**
+ * Walk to the next mission, played once after a finished lesson
+ * (the summary opens the map as /journey?done=<lessonId>):
+ *   finished – the finished stone turns green with a burst of sparks
+ *   walk     – the trail is drawn to the next stone and the avatar walks there
+ *   arrived  – the next stone opens with a bubble saying which mission is next
+ */
+type Arrival = { unitId: string; from: number; to?: number; phase: "finished" | "walk" | "arrived" };
+const WALK_STARTS = 750;
+const WALK_MS = 1000;
+const BUBBLE_MS = 3200;
 type StoneKind = "done" | "current" | "open" | "locked" | "planned";
 
 /** Island colours of the prototype map, reused in order. */
 const TINTS = ["oklch(0.90 0.08 145)", "oklch(0.92 0.08 85)", "oklch(0.90 0.05 305)", "oklch(0.91 0.05 35)", "oklch(0.94 0.06 95)"];
-const RADII = ["46px 64px 52px 70px", "64px 48px 68px 50px", "52px 70px 46px 62px"];
 
 function stoneKind(l: LessonState, nextId: string | undefined): StoneKind {
   if (l.status === "COMPLETED") return "done";
@@ -50,67 +63,33 @@ function worldBadge(state: UnitState, isCurrent: boolean): string {
 const words = (n: number) => `${n} ${plural(n, "słowo", "słowa", "słów")}`;
 const missions = (n: number) => `${n} ${plural(n, "misja", "misje", "misji")}`;
 
-/** Width of an element, kept up to date. The stones are laid out from it. */
-function useWidth<T extends HTMLElement>() {
+/** Wide screens (Tailwind xl) have a right column next to the map. */
+const WIDE = "(min-width: 1280px)";
+function useWide() {
+  return useSyncExternalStore(
+    (change) => {
+      const query = window.matchMedia(WIDE);
+      query.addEventListener("change", change);
+      return () => query.removeEventListener("change", change);
+    },
+    () => window.matchMedia(WIDE).matches,
+    () => false,
+  );
+}
+
+/** Size of an element, kept up to date. The island and its stones are laid out from it. */
+function useSize<T extends HTMLElement>() {
   const ref = useRef<T>(null);
-  const [width, setWidth] = useState(0);
+  const [size, setSize] = useState({ width: 0, height: 0 });
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
-    setWidth(el.clientWidth);
-    const observer = new ResizeObserver(([entry]) => setWidth(Math.round(entry.contentRect.width)));
+    setSize({ width: el.clientWidth, height: el.clientHeight });
+    const observer = new ResizeObserver(([entry]) => setSize({ width: Math.round(entry.contentRect.width), height: Math.round(entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height) }));
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
-  return [ref, width] as const;
-}
-
-/** Snake layout: left to right, then back, as many stones per row as fit. */
-function layoutStones(count: number, width: number) {
-  const cell = width < 480 ? 64 : 88;
-  const cols = Math.max(3, Math.min(count, Math.floor(width / cell)));
-  const colWidth = width / cols;
-  const rowHeight = 128; // tall enough for the avatar pin to stand between two rows
-  const top = 62; // room for the avatar pin above the first row
-  const points = Array.from({ length: count }, (_, i) => {
-    const row = Math.floor(i / cols);
-    const col = row % 2 === 0 ? i % cols : cols - 1 - (i % cols);
-    const wave = cols >= 6 ? Math.sin(i * 1.15) * 13 : 0;
-    return { x: (col + 0.5) * colWidth, y: top + row * rowHeight + 30 + wave };
-  });
-  return { points, height: top + Math.ceil(count / cols) * rowHeight };
-}
-
-function Scenery({ variant }: { variant: number }) {
-  return (
-    <div aria-hidden className="relative hidden h-[70px] w-[132px] shrink-0 md:block">
-      {variant === 0 && (
-        <>
-          <div className="absolute bottom-0 left-2 size-[26px] rounded-full bg-[oklch(0.62_0.15_145)]" />
-          <div className="absolute bottom-0 left-[26px] size-[38px] rounded-full bg-[oklch(0.55_0.14_145)]" />
-          <div className="absolute bottom-0 left-[70px] size-[22px] rounded-full bg-[oklch(0.62_0.15_145)]" />
-          <div className="absolute bottom-0 left-[96px] size-[30px] rounded-full bg-[oklch(0.55_0.14_145)]" />
-        </>
-      )}
-      {variant === 1 && (
-        <>
-          <div className="absolute bottom-0 left-2 h-11 w-10 rounded-t-[5px] bg-coral" />
-          <div className="absolute bottom-11 left-2 h-[22px] w-10 bg-coral-deep" style={{ clipPath: "polygon(50% 0,100% 100%,0 100%)" }} />
-          <div className="absolute bottom-0 left-[58px] h-9 w-[46px] rounded-t-[5px] bg-sky" />
-          <div className="absolute bottom-9 left-[54px] h-3 w-[54px] rounded" style={{ background: "repeating-linear-gradient(90deg,oklch(0.97 0.02 85) 0 8px,oklch(0.62 0.17 35) 8px 16px)" }} />
-        </>
-      )}
-      {variant === 2 && (
-        <>
-          <div className="absolute bottom-0 left-4 h-[60px] w-[22px] rounded-t-[3px] bg-[oklch(0.60_0.05_200)]" />
-          <div className="absolute bottom-0 left-[42px] h-10 w-[18px] rounded-t-[3px] bg-[oklch(0.65_0.05_200)]" />
-          <div className="absolute bottom-0 left-[66px] h-[50px] w-5 rounded-t-[3px] bg-[oklch(0.55_0.10_35)]" />
-          <div className="absolute bottom-[50px] left-[62px] h-[18px] w-7 bg-[oklch(0.45_0.10_35)]" style={{ clipPath: "polygon(50% 0,100% 100%,0 100%)" }} />
-          <div className="absolute bottom-0 left-[94px] size-[30px] rounded-full border-[5px] border-[oklch(0.55_0.14_305)] border-b-transparent" />
-        </>
-      )}
-    </div>
-  );
+  return [ref, size] as const;
 }
 
 function Island({
@@ -122,6 +101,7 @@ function Island({
   selection,
   onSelect,
   avatar,
+  arrival,
 }: {
   state: UnitState;
   index: number;
@@ -131,24 +111,41 @@ function Island({
   selection: Selection;
   onSelect: (s: Selection) => void;
   avatar: { color: string; initial: string };
+  arrival?: Arrival;
 }) {
-  const [pathRef, width] = useWidth<HTMLDivElement>();
+  const [pathRef, { width }] = useSize<HTMLDivElement>();
+  const [islandRef, island] = useSize<HTMLElement>();
   const { unit } = state;
-  const { points, height } = layoutStones(state.lessons.length, width);
+  const { samples, stones: points, at, height } = trail(unit.id, state.lessons.length, width || 320);
+  const theme = themeOf(unit.id);
+  const spots = width ? propSpots(unit.id, width < 480 ? 3 : 6, width, height, samples, points) : [];
+  const props = islandProps(unit.id, spots.length);
+  const propSize = width < 480 ? 56 : 68;
   const worldSelected = selection.unitId === unit.id && !selection.lessonId;
   // The dark part of the trail joins the stones the learner has actually walked.
   const walked = state.lessons.map((l) => state.skipped || l.status === "COMPLETED" || l.lesson.id === nextId);
   const from = walked.indexOf(true);
-  const reached = walked.lastIndexOf(true);
-  const line = (from: number, to: number) => points.slice(from, to + 1).map((p) => `${p.x},${p.y}`).join(" ");
+  const walking = arrival && arrival.to !== undefined && arrival.phase !== "arrived" ? arrival : undefined;
+  // While the avatar walks, the dark trail ends at the finished stone; the new piece is drawn on top.
+  const reached = walking ? walking.from : walked.lastIndexOf(true);
+  const line = (from: number, to: number) => polyline(samples.slice(at[from], at[to] + 1));
+  const pinTop = (i: number, size: number) => points[i].y - size / 2 - 56;
 
   return (
     <section
+      ref={islandRef}
       aria-labelledby={`${unit.id}-title`}
-      className={cx("relative flex flex-col gap-1 px-[clamp(16px,2.5vw,30px)] pb-5 pt-[clamp(18px,2.5vw,26px)]", index % 2 === 1 ? "lg:ml-10" : "lg:mr-10")}
-      style={{ background: tint, borderRadius: RADII[index % RADII.length] }}
+      className={cx("relative flex flex-col gap-1 px-[clamp(34px,4vw,52px)] pb-9 pt-10", index % 2 === 1 ? "lg:ml-10" : "lg:mr-10")}
     >
-      <div className="flex items-end justify-between gap-4">
+      {island.width > 0 && (
+        // The island: shallow water, a sandy shore with a dark coast line, and the land.
+        <svg aria-hidden className="pointer-events-none absolute inset-0" width={island.width} height={island.height}>
+          <path d={coast(unit.id, island.width, island.height, -6)} fill="oklch(0.92 0.035 215)" />
+          <path d={coast(unit.id, island.width, island.height, 2)} fill="oklch(0.90 0.055 85)" stroke="oklch(0.50 0.06 60)" strokeWidth={2.5} />
+          <path d={coast(`${unit.id}.land`, island.width, island.height, 13)} fill={tint} />
+        </svg>
+      )}
+      <div className="relative flex items-end justify-between gap-4">
         <div className="flex min-w-0 flex-col gap-1.5">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-md bg-ink px-2.5 py-[5px] font-mono text-[11px] tracking-[0.08em] text-amber">WORLD {unit.order}</span>
@@ -170,27 +167,89 @@ function Island({
             {state.words.learned} / {words(state.words.target)} · {state.completedLessons} / {missions(state.totalLessons)}
           </button>
         </div>
-        <Scenery variant={index % 3} />
+        <Prop id={theme[0]} size={84} className="mr-5 hidden shrink-0 self-center sm:block" />
       </div>
 
       <div ref={pathRef} className="relative" style={{ height: width ? height : 160 }}>
         {width > 0 && (
           <>
             <svg aria-hidden className="pointer-events-none absolute inset-0" width={width} height={height}>
-              <polyline points={line(0, points.length - 1)} fill="none" stroke="oklch(0.23 0.025 265 / 0.28)" strokeWidth="5" strokeDasharray="2 13" strokeLinecap="round" strokeLinejoin="round" />
-              {reached > from && <polyline points={line(from, reached)} fill="none" stroke="var(--color-ink)" strokeWidth="6" strokeDasharray="2 13" strokeLinecap="round" strokeLinejoin="round" />}
+              <path d={line(0, points.length - 1)} fill="none" stroke="oklch(0.23 0.025 265 / 0.3)" strokeWidth="4" strokeDasharray="9 9" strokeLinecap="round" strokeLinejoin="round" />
+              {reached > from && <path d={line(from, reached)} fill="none" stroke="var(--color-ink)" strokeWidth="5" strokeDasharray="9 9" strokeLinecap="round" strokeLinejoin="round" />}
+              {walking && walking.phase === "walk" && (
+                <>
+                  <mask id={`${unit.id}-walk`} maskUnits="userSpaceOnUse">
+                    <path d={line(walking.from, walking.to!)} fill="none" stroke="white" strokeWidth="14" strokeLinecap="round" pathLength={1} strokeDasharray="1 1" className="animate-kdraw" />
+                  </mask>
+                  <path d={line(walking.from, walking.to!)} mask={`url(#${unit.id}-walk)`} fill="none" stroke="var(--color-ink)" strokeWidth="5" strokeDasharray="9 9" strokeLinecap="round" strokeLinejoin="round" />
+                </>
+              )}
             </svg>
+            {spots.map((p, k) => (
+              <Prop key={k} id={props[k]} size={propSize} className="pointer-events-none absolute" style={{ left: p.x - propSize / 2, top: p.y - propSize + 6 }} />
+            ))}
+            {walking && (
+              // The avatar on its way: it starts on the finished stone and walks to the next one.
+              <div
+                aria-hidden
+                className={cx("pointer-events-none absolute z-[3] flex flex-col items-center", walking.phase === "finished" && "-translate-x-1/2")}
+                style={
+                  walking.phase === "walk"
+                    ? {
+                        // Walks along the trail itself, feet on the path.
+                        left: 0,
+                        top: 0,
+                        offsetPath: `path("${polyline(samples.slice(at[walking.from], at[walking.to!] + 1).map((p) => ({ x: p.x, y: p.y - 30 })))}")`,
+                        offsetAnchor: "50% 100%",
+                        offsetRotate: "0deg",
+                        animation: `kwalk ${WALK_MS}ms cubic-bezier(0.45,0,0.3,1) both`,
+                      }
+                    : { left: points[walking.from].x, top: pinTop(walking.from, 52) }
+                }
+              >
+                <div className={cx("flex flex-col items-center", walking.phase === "walk" && "animate-khop")}>
+                  <div className="grid size-11 place-items-center rounded-full font-display font-extrabold shadow-[0_0_0_3px_var(--color-card),0_6px_12px_oklch(0.23_0.025_265/0.25)]" style={{ background: avatar.color }}>
+                    {avatar.initial}
+                  </div>
+                  <div style={{ width: 0, height: 0, borderLeft: "7px solid transparent", borderRight: "7px solid transparent", borderTop: "9px solid var(--color-card)" }} />
+                </div>
+              </div>
+            )}
             <ol className="m-0 list-none p-0">
               {state.lessons.map((l, i) => {
-                const kind = state.skipped ? "done" : stoneKind(l, nextId);
+                const realKind = state.skipped ? "done" : stoneKind(l, nextId);
+                // Until the avatar gets there, the next stone still looks closed.
+                const kind: StoneKind = walking && i === walking.to ? "locked" : realKind;
+                const justFinished = arrival?.from === i && arrival.phase === "finished";
+                const justOpened = arrival?.to === i && arrival.phase === "arrived";
                 const type = missionKind(l.lesson);
                 const size = kind === "current" ? 66 : type === "CHECKPOINT" ? 60 : 52;
                 const selected = selection.lessonId === l.lesson.id;
                 const { x, y } = points[i];
-                const label = `Misja ${l.lesson.order}: ${l.lesson.title}, ${STONE_LABEL[kind]}`;
+                const label = `Misja ${l.lesson.order}: ${l.lesson.title}, ${STONE_LABEL[realKind]}`;
                 return (
                   <li key={l.lesson.id}>
-                    {kind === "current" && (
+                    {justOpened && (
+                      <p
+                        role="status"
+                        className="pointer-events-none absolute z-[4] m-0 -translate-x-1/2 animate-kpop whitespace-nowrap rounded-full bg-ink px-3.5 py-1.5 font-display text-sm font-extrabold text-on-ink shadow-[0_6px_14px_oklch(0.23_0.025_265/0.25)]"
+                        style={{ left: Math.min(Math.max(x, 84), width - 84), top: y - size / 2 - 96 }}
+                      >
+                        {missionKind(l.lesson) === "LESSON" ? `Misja ${l.lesson.order} czeka!` : missionKind(l.lesson) === "REVIEW" ? "Czas na powtórkę!" : "Czas na wyzwanie!"}
+                      </p>
+                    )}
+                    {justFinished && (
+                      <div aria-hidden className="pointer-events-none absolute z-[2]" style={{ left: x, top: y }}>
+                        {Array.from({ length: 10 }, (_, k) => (
+                          <span
+                            key={k}
+                            className="absolute -left-1.5 -top-1.5 size-3 animate-kspark rounded-full"
+                            style={{ "--a": `${k * 36}deg`, background: k % 2 ? "var(--color-amber)" : "var(--color-moss)", animationDelay: "120ms" } as React.CSSProperties}
+                          />
+                        ))}
+                      </div>
+                    )}
+                    {kind === "current" && !(arrival && arrival.to !== undefined && arrival.phase !== "arrived") && (
                       <div className="pointer-events-none absolute z-[2] flex -translate-x-1/2 flex-col items-center" style={{ left: x, top: y - size / 2 - 56 }} aria-hidden>
                         <div className="grid size-11 place-items-center rounded-full font-display font-extrabold shadow-[0_0_0_3px_var(--color-card),0_6px_12px_oklch(0.23_0.025_265/0.25)]" style={{ background: avatar.color }}>
                           {avatar.initial}
@@ -205,7 +264,7 @@ function Island({
                       aria-label={label}
                       title={l.lesson.title}
                       data-current-stone={kind === "current" || undefined}
-                      className={cx("absolute z-[1]", type === "CHECKPOINT" ? "rounded-[18px]" : "rounded-full")}
+                      className={cx("absolute z-[1]", type === "CHECKPOINT" ? "rounded-[18px]" : "rounded-full", (justFinished || justOpened) && "animate-kpop")}
                       style={{ left: x - size / 2, top: y - size / 2, width: size, height: size }}
                     >
                       {kind === "current" && <span className="pointer-events-none absolute inset-0 animate-kpulse rounded-full bg-amber" />}
@@ -249,6 +308,20 @@ const STONE_LABEL: Record<StoneKind, string> = {
   locked: "zablokowana",
   planned: "w przygotowaniu",
 };
+
+/** Open water between two islands: the route goes on by sea, past a ship or some waves. */
+function SeaCrossing({ index }: { index: number }) {
+  const right = index % 2 === 0;
+  return (
+    <div aria-hidden className="relative h-[76px]">
+      <svg className="absolute left-1/2 top-0 -translate-x-1/2" width="60" height="76" viewBox="0 0 60 76">
+        <path d={right ? "M30 0 C54 22 6 52 30 76" : "M30 0 C6 22 54 52 30 76"} fill="none" stroke="oklch(0.40 0.06 230)" strokeWidth={3.5} strokeDasharray="8 8" strokeLinecap="round" />
+      </svg>
+      <Ship className="absolute top-2" style={right ? { right: "14%" } : { left: "14%" }} />
+      <Waves className="absolute top-6" style={right ? { left: "18%" } : { right: "18%" }} />
+    </div>
+  );
+}
 
 const PANEL = "flex flex-col gap-2.5 rounded-3xl bg-card p-4 xl:gap-3 xl:p-5 shadow-[0_14px_40px_oklch(0.23_0.025_265/0.18),inset_0_0_0_1.5px_var(--color-line-soft)]";
 const CTA = "rounded-2xl p-3.5 text-center font-display text-[17px] font-extrabold";
@@ -380,6 +453,18 @@ export function ChildJourney() {
   const [levelId, setLevelId] = useState<CEFRLevel>(currentLevel.level);
   const [selection, setSelection] = useState<Selection>(home);
   const frame = useRef<HTMLDivElement>(null);
+  const wide = useWide();
+  const router = useRouter();
+  const done = useSearchParams().get("done");
+  // The map renders on the client only (behind LearnerGate), so the motion setting can be read right away.
+  const [arrival, setArrival] = useState<Arrival | undefined>(() => {
+    const unit = done ? currentLevel.units.find((u) => u.lessons.some((l) => l.lesson.id === done)) : undefined;
+    const from = unit ? unit.lessons.findIndex((l) => l.lesson.id === done) : -1;
+    if (!unit || from < 0 || unit.lessons[from].status !== "COMPLETED" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+    const to = unit.lessons[from + 1]?.lesson.id === nextId ? from + 1 : undefined;
+    return { unitId: unit.unit.id, from, to, phase: "finished" };
+  });
+  const walkPlays = useRef(arrival !== undefined);
 
   const level = levels.find((l) => l.level === levelId) ?? currentLevel;
   const levelIndex = levels.indexOf(level);
@@ -395,8 +480,33 @@ export function ChildJourney() {
     frame.current?.scrollIntoView({ block: "start" });
   }
 
+  // Coming from a finished lesson: play the walk to the next mission once.
+  useEffect(() => {
+    if (done) router.replace("/journey", { scroll: false });
+    if (!arrival) return;
+    const { from, to, unitId } = arrival;
+    const order = units.find((u) => u.unit.id === unitId)?.lessons[from].lesson.order;
+    const timers = [
+      window.setTimeout(() => {
+        const unitBox = frame.current?.querySelector(`[aria-labelledby="${unitId}-title"]`);
+        unitBox?.querySelector<HTMLElement>(`[aria-label^="Misja ${order}:"]`)?.scrollIntoView({ block: "center", behavior: "smooth" });
+      }, 60),
+      ...(to === undefined
+        ? [window.setTimeout(() => setArrival(undefined), 1400)]
+        : [
+            window.setTimeout(() => setArrival((a) => a && { ...a, phase: "walk" }), WALK_STARTS),
+            window.setTimeout(() => setArrival((a) => a && { ...a, phase: "arrived" }), WALK_STARTS + WALK_MS + 50),
+            window.setTimeout(() => setArrival(undefined), WALK_STARTS + WALK_MS + BUBBLE_MS),
+          ]),
+    ];
+    return () => timers.forEach((t) => window.clearTimeout(t));
+    // Played once, on arrival only.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // On arrival, bring the learner's stone into view if it is below the fold.
   useEffect(() => {
+    if (walkPlays.current) return;
     const timer = window.setTimeout(() => {
       const stone = frame.current?.querySelector<HTMLElement>("[data-current-stone]");
       if (!stone) return;
@@ -434,18 +544,20 @@ export function ChildJourney() {
       </div>
 
       <LevelTabs levels={levels} selected={level.level} onSelect={openLevel} />
-      <LevelProgram level={level} />
+      {/* On wide screens the programme moves to the right column, above the mission card. */}
+      {!wide && <LevelProgram level={level} />}
 
       <div ref={frame} className="grid scroll-mt-4 grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_330px]">
         <div
           role="tabpanel"
           aria-label={`Mapa poziomu ${level.level}`}
-          className="flex flex-col rounded-[36px] bg-[oklch(0.86_0.06_225)] p-[clamp(12px,2vw,26px)] shadow-[0_8px_0_oklch(0.75_0.06_225)]"
+          className="relative flex flex-col rounded-[36px] bg-[oklch(0.86_0.06_225)] p-[clamp(12px,2vw,26px)] shadow-[0_8px_0_oklch(0.75_0.06_225)]"
           style={{ backgroundImage: "radial-gradient(oklch(0.80 0.06 225) 1.2px,transparent 1.4px)", backgroundSize: "22px 22px" }}
         >
+          <Compass className="pointer-events-none absolute -right-2 -top-4 z-[1] hidden sm:block" />
           {level.units.map((state, i) => (
             <div key={state.unit.id} className="flex flex-col">
-              {i > 0 && <div aria-hidden className="mx-auto h-10 w-0 border-l-[5px] border-dotted border-[oklch(0.45_0.05_225)]" />}
+              {i > 0 && <SeaCrossing index={i} />}
               <Island
                 state={state}
                 index={i}
@@ -455,14 +567,16 @@ export function ChildJourney() {
                 selection={selection}
                 onSelect={setSelection}
                 avatar={avatar}
+                arrival={arrival?.unitId === state.unit.id && level.level === currentLevel.level ? arrival : undefined}
               />
             </div>
           ))}
-          <div aria-hidden className="mx-auto h-10 w-0 border-l-[5px] border-dotted border-[oklch(0.45_0.05_225)]" />
+          <SeaCrossing index={level.units.length} />
           <Gate level={level} following={levels[levelIndex + 1]} onOpen={openLevel} />
         </div>
 
-        <aside aria-live="polite" className="sticky bottom-[96px] z-10 lg:bottom-4 xl:top-5 xl:bottom-auto">
+        <aside aria-live="polite" className="sticky bottom-[96px] z-10 flex flex-col gap-4 lg:bottom-4 xl:top-5 xl:bottom-auto">
+          {wide && <LevelProgram level={level} />}
           {selectedUnit && selectedLesson ? <MissionPanel state={selectedUnit} lesson={selectedLesson} nextId={nextId} /> : selectedUnit ? <WorldPanel state={selectedUnit} isCurrent={selectedUnit.unit.id === current?.unit.id} /> : null}
         </aside>
       </div>

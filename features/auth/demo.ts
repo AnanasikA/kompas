@@ -66,5 +66,11 @@ export function buildDemoState(demo: DemoAccount, now: Date): AppState {
     wordStats: {},
     round: null,
     pendingReward: null,
+    demoEdition: demo.edition,
   };
+}
+
+/** Saved progress of a test account that predates its current edition starts over. */
+export function isCurrentDemoState(demo: DemoAccount, state: AppState): boolean {
+  return (state.demoEdition ?? 1) === demo.edition;
 }

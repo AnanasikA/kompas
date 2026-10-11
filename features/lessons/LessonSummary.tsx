@@ -264,10 +264,10 @@ export function LessonSummary({ lessonId }: { lessonId: string }) {
           )}
           <button
             type="button"
-            onClick={() => (hasReward ? router.push(`/lesson/${lessonId}/reward`) : leave("/home"))}
+            onClick={() => (hasReward ? router.push(`/lesson/${lessonId}/reward`) : leave(`/journey?done=${lessonId}`))}
             className="rounded-[20px] bg-amber p-5 text-center font-display text-[21px] font-extrabold shadow-[0_6px_0_var(--color-amber-deep)] transition-transform active:translate-y-[5px] active:shadow-[0_1px_0_var(--color-amber-deep)]"
           >
-            {hasReward ? "Odbierz nagrodę →" : "Wróć do bazy →"}
+            {hasReward ? "Odbierz nagrodę →" : "Dalej na mapę →"}
           </button>
           {missed.length > 0 && (
             <button type="button" onClick={() => leave("/practice")} className="self-center rounded-lg px-3 py-2 text-sm font-semibold text-muted hover:bg-sand">

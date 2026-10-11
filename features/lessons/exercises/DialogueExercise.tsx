@@ -9,6 +9,8 @@ import { useSkin } from "@/features/theme/useSkin";
 import { audioPlayer } from "@/lib/services/tts";
 import { cx } from "@/lib/utils";
 import type { DialogueExercise as DialogueEx, DialogueOption } from "@/types";
+import { useAppStore } from "@/lib/store/app-store";
+import { sceneColours, withName } from "../scenes";
 import type { ExerciseViewProps } from "./types";
 
 const VOICE = { lang: "en-GB", rate: 0.9 };
@@ -19,12 +21,13 @@ function speak(text: string) {
   });
 }
 
-/** Café illustration from the prototype (barista behind the counter, menu board). */
-function CafeScene({ exercise }: { exercise: DialogueEx }) {
+/** Scene illustration (the café from the prototype, or another place): the character and an optional board. */
+function SceneFigure({ exercise }: { exercise: DialogueEx }) {
   const { character } = exercise.script;
   const board = exercise.scene.board;
+  const colours = sceneColours(exercise);
   return (
-    <div className="relative min-h-[220px] md:min-h-0">
+    <div className={cx("relative md:min-h-0", board ? "min-h-[220px]" : "min-h-[60px]")}>
       {board && (
         <div className="absolute left-[12%] top-[8%] flex w-[62%] flex-col gap-1 rounded-[10px] bg-[oklch(0.28_0.03_160)] px-3.5 py-3 font-mono text-[11px] text-[oklch(0.95_0.02_100)]">
           <div className="font-display text-[15px] font-extrabold text-[oklch(0.85_0.12_85)]">{board.title}</div>
@@ -37,7 +40,7 @@ function CafeScene({ exercise }: { exercise: DialogueEx }) {
         </div>
       )}
       <div aria-hidden className="hidden md:block">
-        <div className="absolute bottom-[26%] left-1/2 h-[170px] w-[150px] -translate-x-1/2 rounded-t-[75px] bg-sky" />
+        <div className="absolute bottom-[26%] left-1/2 h-[170px] w-[150px] -translate-x-1/2 rounded-t-[75px]" style={{ background: colours.body }} />
         <div className="absolute left-1/2 h-[100px] w-[110px] -translate-x-1/2 rounded-b-[20px] bg-[oklch(0.97_0.01_85)]" style={{ bottom: "calc(26% + 70px)" }} />
         <div className="absolute left-1/2 size-[92px] -translate-x-1/2 rounded-full bg-[oklch(0.78_0.07_55)]" style={{ bottom: "calc(26% + 150px)" }} />
         <div className="absolute left-1/2 h-[34px] w-[100px] -translate-x-1/2 rounded-[50px_50px_8px_8px] bg-[oklch(0.30_0.04_50)]" style={{ bottom: "calc(26% + 218px)" }} />
@@ -56,6 +59,8 @@ function CafeScene({ exercise }: { exercise: DialogueEx }) {
 export function DialogueExercise({ exercise, onMistake, onSolved, onContinue, showXp, continueLabel }: ExerciseViewProps<DialogueEx>) {
   const age = useAge();
   const skin = useSkin();
+  const learnerName = useAppStore((s) => s.user?.name);
+  const say = (text: string) => withName(text, learnerName);
   const responder = useMemo(() => new ScriptedResponder(exercise.script), [exercise.script]);
   const [state, setState] = useState<DialogueState>(() => createDialogueState(exercise.script));
   const [hint, setHint] = useState<string | null>(null);
@@ -67,7 +72,7 @@ export function DialogueExercise({ exercise, onMistake, onSolved, onContinue, sh
   const lastLine = state.turns[state.turns.length - 1]?.text ?? "";
 
   useEffect(() => {
-    speak(exercise.script.nodes[exercise.script.startNodeId].line);
+    speak(withName(exercise.script.nodes[exercise.script.startNodeId].line, useAppStore.getState().user?.name));
     return () => audioPlayer.stop();
   }, [exercise.script]);
 
@@ -89,7 +94,7 @@ export function DialogueExercise({ exercise, onMistake, onSolved, onContinue, sh
       return;
     }
     setHint(null);
-    speak(reply.characterLine);
+    speak(say(reply.characterLine));
     if (reply.state.ended) onSolved();
   }
 
@@ -118,7 +123,7 @@ export function DialogueExercise({ exercise, onMistake, onSolved, onContinue, sh
               )}
             >
               <span className="sr-only">{character.name}: </span>
-              {turn.text}
+              {say(turn.text)}
             </span>
           </div>
         ) : (
@@ -132,7 +137,7 @@ export function DialogueExercise({ exercise, onMistake, onSolved, onContinue, sh
               )}
             >
               <span className="sr-only">Ty: </span>
-              {turn.text}
+              {say(turn.text)}
             </span>
           </div>
         ),
@@ -144,7 +149,7 @@ export function DialogueExercise({ exercise, onMistake, onSolved, onContinue, sh
   const replay = (
     <button
       type="button"
-      onClick={() => speak(lastLine)}
+      onClick={() => speak(say(lastLine))}
       className={cx(
         "self-start font-mono text-[11px]",
         age === "CHILD" && "rounded-full bg-sky-soft px-3 py-[7px]",
@@ -153,7 +158,7 @@ export function DialogueExercise({ exercise, onMistake, onSolved, onContinue, sh
       )}
     >
       <PlayGlyph />
-      {age === "CHILD" ? `posłuchaj ${character.name === "Sam" ? "Sama" : character.name}` : "REPLAY"}
+      {age === "CHILD" ? "posłuchaj jeszcze raz" : "REPLAY"}
     </button>
   );
 
@@ -191,7 +196,7 @@ export function DialogueExercise({ exercise, onMistake, onSolved, onContinue, sh
             age === "ADULT" && "rounded-md border border-canvas-line-strong bg-[oklch(0.995_0.003_90)] px-[18px] py-3.5 text-base hover:border-ink",
           )}
         >
-          {o.text}
+          {say(o.text)}
         </button>
       ))}
     </div>
@@ -214,7 +219,7 @@ export function DialogueExercise({ exercise, onMistake, onSolved, onContinue, sh
         {xp ? <span className={skin.xp}>+{xp} XP</span> : null}
       </div>
       <button type="button" onClick={onContinue} className={cx(skin.primary, "text-center", age !== "CHILD" && "self-start")} autoFocus>
-        {continueLabel ?? skin.t.finish}
+        {continueLabel ?? skin.t.next}
       </button>
     </div>
   );
@@ -247,10 +252,10 @@ export function DialogueExercise({ exercise, onMistake, onSolved, onContinue, sh
           </div>
           {progress}
         </div>
-        <div className="relative grid grid-cols-1 overflow-hidden rounded-[36px] bg-[oklch(0.88_0.05_60)] md:min-h-[520px] md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
-          <div className="absolute inset-x-0 bottom-0 hidden h-[26%] bg-[oklch(0.55_0.08_55)] md:block" aria-hidden />
-          <div className="absolute inset-x-0 bottom-[26%] hidden h-[18px] bg-[oklch(0.45_0.07_50)] md:block" aria-hidden />
-          <CafeScene exercise={exercise} />
+        <div className="relative grid grid-cols-1 overflow-hidden rounded-[36px] md:min-h-[520px] md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]" style={{ background: sceneColours(exercise).wall }}>
+          <div className="absolute inset-x-0 bottom-0 hidden h-[26%] md:block" style={{ background: sceneColours(exercise).floor }} aria-hidden />
+          <div className="absolute inset-x-0 bottom-[26%] hidden h-[18px] md:block" style={{ background: sceneColours(exercise).edge }} aria-hidden />
+          <SceneFigure exercise={exercise} />
           <div className="relative flex min-h-[380px] flex-col gap-3 bg-card/72 p-[22px] backdrop-blur-[6px]">
             {bubbles}
             {replay}
@@ -283,7 +288,7 @@ export function DialogueExercise({ exercise, onMistake, onSolved, onContinue, sh
             <span className="pt-1.5 font-mono text-[11px] text-night-muted">TURNS: {state.steps}</span>
           </div>
         </div>
-        <div className="flex min-h-[520px] flex-col gap-3 rounded-xl bg-night-surface p-5 lg:col-span-2">
+        <div className="flex flex-col gap-3 rounded-xl bg-night-surface p-5 lg:col-span-2 lg:min-h-[520px]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div className="grid size-9 place-items-center rounded-lg bg-[oklch(0.40_0.06_225)] font-mono text-xs" aria-hidden>
@@ -314,7 +319,7 @@ export function DialogueExercise({ exercise, onMistake, onSolved, onContinue, sh
         {progress}
         <span className="font-mono text-[11px] text-faint">Wybierasz odpowiedź · rozmowa idzie dalej zależnie od niej</span>
       </div>
-      <div className="flex min-h-[540px] flex-col gap-3.5 rounded-[10px] bg-canvas-card p-6 shadow-[inset_0_0_0_1px_var(--color-canvas-line)] lg:col-span-2">
+      <div className="flex flex-col gap-3.5 rounded-[10px] bg-canvas-card p-6 shadow-[inset_0_0_0_1px_var(--color-canvas-line)] lg:col-span-2 lg:min-h-[540px]">
         {bubbles}
         {hintBox}
         {!state.ended && replay}

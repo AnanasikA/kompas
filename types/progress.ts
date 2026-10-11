@@ -139,4 +139,6 @@ export interface AppState {
   round: TopicRound | null;
   /** Lesson to show the level-up screen for, set when a lesson raised the level. */
   pendingReward: { lessonId: string; fromLevel: number; toLevel: number } | null;
+  /** Test accounts only: which edition of the account this progress belongs to (data/demo/accounts). */
+  demoEdition?: number;
 }

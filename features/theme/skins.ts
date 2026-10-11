@@ -69,7 +69,7 @@ const child: Skin = {
   xp: "inline-block animate-kpop rounded-full bg-ink px-3 py-1.5 font-mono text-[15px] font-medium text-amber",
   card: "rounded-[28px] bg-card shadow-[0_4px_0_var(--color-line),inset_0_0_0_1.5px_var(--color-line-soft)]",
   t: {
-    check: "CHECK →",
+    check: "SPRAWDŹ →",
     next: "Dalej →",
     retry: "Spróbuj ponownie",
     replay: "Posłuchaj jeszcze raz",

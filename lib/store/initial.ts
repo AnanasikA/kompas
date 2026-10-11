@@ -28,4 +28,5 @@ export const initialState: AppState = {
   wordStats: {},
   round: null,
   pendingReward: null,
+  demoEdition: undefined,
 };

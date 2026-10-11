@@ -139,6 +139,7 @@ function snapshot(store: AppStore): AppState {
     wordStats: store.wordStats,
     round: store.round,
     pendingReward: store.pendingReward,
+    ...(store.demoEdition !== undefined && { demoEdition: store.demoEdition }),
   };
 }
 

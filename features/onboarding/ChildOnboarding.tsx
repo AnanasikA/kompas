@@ -415,7 +415,7 @@ function Result() {
           </p>
         </div>
         <button type="button" onClick={() => router.push("/home")} className={cx(INK_BTN, "mt-auto p-[18px] text-center")}>
-          START ADVENTURE →
+          RUSZAMY →
         </button>
       </div>
     </div>

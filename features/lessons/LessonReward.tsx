@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useAge } from "@/features/theme/AgeScope";
 import { useAppStore } from "@/lib/store/app-store";
 import { cx } from "@/lib/utils";
@@ -15,9 +15,11 @@ export function LessonReward({ lessonId }: { lessonId: string }) {
   const clearReward = useAppStore((s) => s.clearReward);
   const { level, rank, units, unitState, lesson, due } = useLessonContext(lessonId);
   const valid = reward?.lessonId === lessonId;
+  // Leaving clears the reward; this keeps the redirect below from overriding where the learner goes.
+  const leaving = useRef(false);
 
   useEffect(() => {
-    if (!valid) router.replace("/home");
+    if (!valid && !leaving.current) router.replace("/home");
   }, [valid, router]);
 
   if (!valid || !reward) return <div className="min-h-dvh" aria-busy="true" />;
@@ -25,6 +27,7 @@ export function LessonReward({ lessonId }: { lessonId: string }) {
   const unitDone = unitState?.status === "COMPLETED";
   const unlockedUnit = unitDone ? units.find((u) => u.unit.order > (unitState?.unit.order ?? 0) && u.status !== "LOCKED") : undefined;
   const go = (href: string) => {
+    leaving.current = true;
     clearReward();
     router.push(href);
   };
@@ -128,10 +131,10 @@ export function LessonReward({ lessonId }: { lessonId: string }) {
         <button
           type="button"
           autoFocus
-          onClick={() => go("/home")}
+          onClick={() => go(`/journey?done=${lessonId}`)}
           className="rounded-[18px] bg-amber px-[34px] py-[18px] font-display text-[19px] font-extrabold text-ink shadow-[0_6px_0_var(--color-amber-deep)] transition-transform active:translate-y-[5px] active:shadow-[0_1px_0_var(--color-amber-deep)]"
         >
-          Wróć do bazy →
+          Dalej na mapę →
         </button>
       </div>
     </div>

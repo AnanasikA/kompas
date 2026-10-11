@@ -80,7 +80,7 @@ await page.waitForURL("**/onboarding/result");
 check("4. placement gives a level", await text("Twój poziom: A1 Explorer").isVisible());
 check("4b. skipped worlds are named", await text(/Pomijasz Hello World i Home/).isVisible());
 await shot("08-child-result");
-await button("START ADVENTURE →").click();
+await button("RUSZAMY →").click();
 
 // 5. Dashboard
 await page.waitForURL("**/home");
@@ -90,7 +90,7 @@ await shot("09-dashboard-fresh");
 
 // 6. Journey
 await page.getByRole("link", { name: /Podróż/ }).first().click();
-await page.waitForURL("**/journey");
+await page.waitForURL(/\/journey/);
 const island = (name) => page.getByRole("region", { name, exact: true });
 await island("Food Town").getByText("TU JESTEŚ").waitFor();
 check("6. Food Town is current, on mission 7 of 10", await button("Misja 7: Ordering at a café, tu jesteś").isVisible());
@@ -108,7 +108,7 @@ await shot("11-food-town");
 await page.getByRole("link", { name: /LEKCJA 7 · NASTĘPNA/ }).click();
 await page.waitForURL("**/lesson/child.food-town.ordering-at-a-cafe");
 await shot("12-lesson-start");
-await page.getByRole("link", { name: "START LESSON →" }).click();
+await page.getByRole("link", { name: "ZACZNIJ →" }).click();
 await page.waitForURL("**/play");
 
 // 8–9. Exercises
@@ -133,12 +133,12 @@ await button("Dalej →").click();
 await text("Który obrazek pokazuje…").waitFor();
 check("8. progress bar moves", (await progressNow()) === "1");
 await page.getByRole("radio", { name: "Obrazek 1" }).click();
-await button("CHECK →").click();
+await button("SPRAWDŹ →").click();
 await text("Prawie! Spójrz jeszcze raz.").waitFor();
 await shot("14-ex2-image-feedback-almost");
 await button("Spróbuj ponownie").click();
 await page.getByRole("radio", { name: "Obrazek 3" }).click();
-await button("CHECK →").click();
+await button("SPRAWDŹ →").click();
 await text("Świetnie! A sandwich.").waitFor();
 await shot("15-ex2-image-feedback-correct");
 await button("Dalej →").click();
@@ -154,7 +154,7 @@ await button("Odtwórz nagranie").click();
 check("L. play button reports its state", await button(/Zatrzymaj nagranie|Posłuchaj jeszcze raz/).isVisible());
 await page.getByRole("radio", { name: "Obrazek 2" }).click();
 await shot("16-ex3-listening");
-await button("CHECK →").click();
+await button("SPRAWDŹ →").click();
 await text("Świetnie! Orange juice.").waitFor();
 await button("Dalej →").click();
 
@@ -162,7 +162,7 @@ await button("Dalej →").click();
 await text("Ułóż zamówienie po angielsku").waitFor();
 const bank = page.getByRole("group", { name: "Słowa do wyboru" });
 for (const w of ["I'd", "want", "a", "hot", "chocolate,", "please."]) await bank.getByRole("button", { name: w, exact: true }).click();
-await button("CHECK →").click();
+await button("SPRAWDŹ →").click();
 check("11a. distractor gets its own explanation", await text(/„I want…” brzmi w kawiarni zbyt bezpośrednio/).isVisible());
 await shot("17-ex4-sentence-almost");
 await button("Spróbuj ponownie").click();
@@ -174,7 +174,7 @@ await button("Wyczyść").click();
 check("11c. reset clears the sentence", (await page.getByRole("group", { name: "Twoje zdanie" }).getByRole("button").count()) === 0);
 for (const w of ["I'd", "like", "a", "hot", "chocolate,", "please."]) await bank.getByRole("button", { name: w, exact: true }).click();
 await shot("18-ex4-sentence-built");
-await button("CHECK →").click();
+await button("SPRAWDŹ →").click();
 await text("Idealne zamówienie!").waitFor();
 await button("Dalej →").click();
 
@@ -182,7 +182,7 @@ await button("Dalej →").click();
 await text("Które słowo pasuje?").waitFor();
 await page.getByRole("radio", { name: "Can" }).click();
 await shot("19-ex5-fill-gap");
-await button("CHECK →").click();
+await button("SPRAWDŹ →").click();
 await text("Dobrze! Can I have…?").waitFor();
 await button("Dalej →").click();
 
@@ -231,15 +231,16 @@ check("11b. mistakes are listed for review", await text("I like ≠ I'd like").i
 await shot("24-summary");
 const hasReward = await button("Odbierz nagrodę →").isVisible();
 check("12b. no level-up below 100 XP", !hasReward);
-await button("Wróć do bazy →").click();
+await button("Dalej na mapę →").click();
+await page.waitForURL(/\/journey/);
 
 // 13. Saved progress
-await page.waitForURL("**/home");
+await page.goto(`${BASE}/home`, { waitUntil: "networkidle" });
 check("13. dashboard shows the finished lesson", await text("OSTATNIA LEKCJA").isVisible() && (await text(/43% trafnych · \+83 XP/).isVisible()));
 check("13b. XP bar updated", await text("83 / 100 XP").first().isVisible());
 await shot("25-dashboard-after");
 await page.getByRole("link", { name: /Podróż/ }).first().click();
-await page.waitForURL("**/journey");
+await page.waitForURL(/\/journey/);
 await button("Misja 7: Ordering at a café, ukończona").waitFor();
 check("13c. one mission is done, Food Town is not: 1 of 10", await island("Food Town").getByText("6 / 80 słów · 1 / 10 misji").isVisible());
 check("13d. level A1 counts the lesson's words, not the whole level", (await text("6 / 400").isVisible()) && (await text("1 / 50").isVisible()));
@@ -265,7 +266,7 @@ while (!(await text("Powtórka skończona!").isVisible()) && guard++ < 12) {
     await page.getByRole("radio").first().click();
   }
   if (guard === 1) await shot("28-practice-session");
-  await button("CHECK →").click();
+  await button("SPRAWDŹ →").click();
   const retry = button("Spróbuj ponownie");
   const next = page.getByRole("button", { name: /Dalej →|Zakończ powtórkę →/ });
   await retry.or(next).first().waitFor();
@@ -276,7 +277,7 @@ while (!(await text("Powtórka skończona!").isVisible()) && guard++ < 12) {
     const n = await radios.count();
     for (let i = 1; i < n; i++) {
       await radios.nth(i).click();
-      await button("CHECK →").click();
+      await button("SPRAWDŹ →").click();
       await retry.or(next).first().waitFor();
       if (await next.isVisible()) break;
       await retry.click();
@@ -304,7 +305,7 @@ await shot("31-parent");
 
 // Second run: clean replay → level up and reward screen
 await page.goto(`${BASE}/lesson/child.food-town.ordering-at-a-cafe`);
-await page.getByRole("link", { name: "POWTÓRZ LEKCJĘ →" }).click();
+await page.getByRole("link", { name: "ZAGRAJ JESZCZE RAZ →" }).click();
 await text("Połącz pary ze słowami z kawiarni").waitFor();
 for (const [l, r] of [["menu", "karta dań"], ["a cup", "filiżanka"], ["hot", "gorący"], ["the bill", "rachunek"], ["sweet", "słodki"]]) {
   await button(l, { exact: true }).click();
@@ -312,16 +313,16 @@ for (const [l, r] of [["menu", "karta dań"], ["a cup", "filiżanka"], ["hot", "
 }
 await button("Dalej →").click();
 await page.getByRole("radio", { name: "Obrazek 3" }).click();
-await button("CHECK →").click();
+await button("SPRAWDŹ →").click();
 await button("Dalej →").click();
 await page.getByRole("radio", { name: "Obrazek 2" }).click();
-await button("CHECK →").click();
+await button("SPRAWDŹ →").click();
 await button("Dalej →").click();
 for (const w of ["I'd", "like", "a", "hot", "chocolate,", "please."]) await page.getByRole("group", { name: "Słowa do wyboru" }).getByRole("button", { name: w, exact: true }).click();
-await button("CHECK →").click();
+await button("SPRAWDŹ →").click();
 await button("Dalej →").click();
 await page.getByRole("radio", { name: "Can" }).click();
-await button("CHECK →").click();
+await button("SPRAWDŹ →").click();
 await button("Dalej →").click();
 await button("Nie mogę teraz mówić").click();
 for (const reply of ["I'd like a hot chocolate, please.", "Small, please.", "No, thank you.", "No, thanks. How much is it?", "Here you are."]) await button(reply).click();
@@ -332,8 +333,9 @@ check("R. replay pays only the improvement and levels up", await button("Odbierz
 await button("Odbierz nagrodę →").click();
 await text("Level 2 odblokowany!").waitFor();
 await shot("32-reward");
-await button("Wróć do bazy →").click();
-await page.waitForURL("**/home");
+await button("Dalej na mapę →").click();
+await page.waitForURL(/\/journey/);
+await page.goto(`${BASE}/home`, { waitUntil: "networkidle" });
 // best run: 105 (speaking skipped) → +22 on top of 83
 check("R2. total XP after replay", await text("Level 2").first().isVisible() && (await text("5 / 200 XP").first().isVisible()));
 

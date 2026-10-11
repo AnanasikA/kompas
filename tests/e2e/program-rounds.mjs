@@ -38,24 +38,15 @@ const savedRound = (page, account) => page.evaluate((id) => JSON.parse(localStor
   const island = (name) => page.getByRole("region", { name, exact: true });
 
   await page.goto(`${BASE}/journey`, { waitUntil: "networkidle" });
-  check("map: opens on the learner's level", (await page.getByRole("tab", { name: /^A1/ }).getAttribute("aria-selected")) === "true");
-  check("map: Pre-A1 counts as passed in the placement test", /✓/.test(await page.getByRole("tab", { name: /^Pre-A1/ }).innerText()));
-  check("map: A1 has 5 worlds and 50 numbered missions", (await page.getByRole("region").count()) === 5 && (await btn(/^Misja \d+:/).count()) === 50);
-  check("map: the learner stands on mission 7 of Food Town", await island("Food Town").getByRole("button", { name: "Misja 7: Ordering at a café, tu jesteś" }).isVisible());
-  await btn("Misja 1: Fruit & veg, w przygotowaniu").click();
-  check("map: a planned mission says what it will teach", (await page.getByText("Misja w przygotowaniu").isVisible()) && (await page.getByText(/10 słów/).first().isVisible()));
-  await btn("Misja 7: Ordering at a café, tu jesteś").click();
-  check("map: the current mission can be started from the map", await page.getByRole("link", { name: "Start →" }).isVisible());
-
-  await page.getByText("Co trzeba umieć, żeby zaliczyć A1").click();
-  check("program: A1 lists its 11 grammar topics", (await page.getByText("GRAMATYKA · 11").isVisible()) && (await page.getByText("there is / there are").isVisible()));
-  check("program: each topic says where it is taught", await page.getByText("gdzie: Food Town").first().isVisible());
-  await page.screenshot({ path: `${OUT}/pr-child-map.png`, fullPage: true });
-
-  check("gate: says what A1 takes", await page.getByText(/Otworzy się po całym programie A1: 400 słów, 11 zagadnień gramatycznych i 50 misji/).isVisible());
-  await btn(/Zobacz, co jest dalej: A2/).click();
-  check("gate: the next level can be previewed", (await page.getByRole("tab", { name: /^A2/ }).getAttribute("aria-selected")) === "true" && (await page.getByRole("region").count()) === 6 && (await btn(/^Misja \d+:/).count()) === 72);
-  check("program: A2 is 600 words", await page.getByText("/ 600").first().isVisible());
+  check("map: opens on the learner's level", (await page.getByRole("tab", { name: /^Pre-A1/ }).getAttribute("aria-selected")) === "true");
+  check("map: Pre-A1 has 2 worlds and 24 numbered missions", (await page.getByRole("region").count()) === 2 && (await btn(/^Misja \d+:/).count()) === 24);
+  check("map: Hello World is written in full", (await island("Hello World").getByRole("button", { name: /w przygotowaniu/ }).count()) === 0);
+  check("map: the learner starts on mission 1 of Hello World", await island("Hello World").getByRole("button", { name: "Misja 1: Hello!, tu jesteś" }).isVisible());
+  await btn(/^Misja 1: My family/).click();
+  check("gate: says what Pre-A1 takes", await page.getByText(/Otworzy się po całym programie Pre-A1: 200 słów, 6 zagadnień gramatycznych/).isVisible());
+  await btn(/Zobacz, co jest dalej: A1/).click();
+  check("gate: the next level can be previewed", (await page.getByRole("tab", { name: /^A1/ }).getAttribute("aria-selected")) === "true" && (await page.getByRole("region").count()) === 5 && (await btn(/^Misja \d+:/).count()) === 50);
+  check("program: A1 is 400 words", await page.getByText("/ 400").first().isVisible());
   await page.getByRole("tab", { name: /^B2/ }).click();
   check("map: the road is laid out to the end of B2", (await page.getByRole("region").count()) === 10 && (await page.getByText("META PODRÓŻY").isVisible()));
 
@@ -82,11 +73,11 @@ const savedRound = (page, account) => page.evaluate((id) => JSON.parse(localStor
         if (i === mistakeOnStep) {
           const wrong = exercise.options.find((o) => o.id !== exercise.correctOptionId);
           await page.getByRole("radio", { name: wrong.text, exact: true }).click();
-          await btn("CHECK →").click();
+          await btn("SPRAWDŹ →").click();
           await btn("Spróbuj ponownie").click();
         }
         await page.getByRole("radio", { name: text(exercise.correctOptionId), exact: true }).click();
-        await btn("CHECK →").click();
+        await btn("SPRAWDŹ →").click();
       }
       if (i === 0) await page.screenshot({ path: `${OUT}/pr-child-round.png`, fullPage: true });
       await btn(/Dalej →|Zakończ rundę →/).click();
@@ -111,7 +102,8 @@ const savedRound = (page, account) => page.evaluate((id) => JSON.parse(localStor
   await page.getByRole("progressbar").waitFor();
   state = await savedRound(page, "demo-child");
   const secondWords = state.round.steps.flatMap((s) => s.wordIds);
-  check("round: the next round brings new words", secondWords.some((id) => !firstLevels.includes(id)), `${new Set(secondWords).size} words`);
+  // A Pre-A1 learner has 8 words per topic, all used in the first round: the next one starts over with them.
+  check("round: the next round starts from the beginning", state.round.index === 0 && state.round.results.length === 0 && new Set(secondWords).size === 8, `${new Set(secondWords).size} words`);
   await playRound({ mistakeOnStep: 1 });
   state = await savedRound(page, "demo-child");
   check("round: a mistake costs XP and the word comes back", state.round.summary.xp < 22 && (await page.getByText("wróci w następnej rundzie").first().isVisible()));

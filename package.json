@@ -12,7 +12,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "e2e": "node tests/e2e/first-milestone.mjs && node tests/e2e/age-modes.mjs && node tests/e2e/accounts.mjs && node tests/e2e/program-rounds.mjs",
+    "e2e": "node tests/e2e/first-milestone.mjs && node tests/e2e/age-modes.mjs && node tests/e2e/accounts.mjs && node tests/e2e/program-rounds.mjs && node tests/e2e/hello-world.mjs",
     "check": "tsc --noEmit && eslint . && vitest run"
   },
   "dependencies": {

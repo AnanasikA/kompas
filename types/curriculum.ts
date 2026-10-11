@@ -25,8 +25,39 @@ export interface AudioSource {
   rate?: number;
 }
 
-/** Ids of illustrations that the presentation layer knows how to draw. */
-export type IllustrationId = "coffee" | "juice" | "sandwich" | "water";
+export type Colour = "red" | "blue" | "green" | "yellow" | "orange" | "pink" | "purple" | "black" | "white" | "brown";
+export type Feeling = "happy" | "sad" | "tired" | "hungry";
+export type TimeOfDay = "morning" | "afternoon" | "evening" | "night";
+export type Count = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+/** Pictures of the Home world (components/ui/HomeDrawings). */
+export type HomeThing =
+  | "mum" | "dad" | "sister" | "brother" | "baby" | "grandma" | "grandpa"
+  | "kitchen" | "bathroom" | "bedroom" | "living-room"
+  | "bed" | "table" | "chair" | "lamp"
+  | "ball" | "doll" | "teddy" | "car" | "train" | "kite"
+  | "dog" | "cat" | "fish" | "bird" | "rabbit"
+  | "jump" | "swim" | "climb" | "dance" | "run" | "fly"
+  | "tshirt" | "shoes" | "hat" | "dress" | "jacket" | "socks"
+  | "where-in" | "where-on" | "where-under" | "where-next-to";
+
+/** Ids of illustrations that the presentation layer knows how to draw (components/ui/Illustration). */
+export type IllustrationId =
+  | "coffee"
+  | "juice"
+  | "sandwich"
+  | "water"
+  | "cake"
+  | "present"
+  | "balloon"
+  | "candle"
+  | `colour-${Colour}`
+  | `face-${Feeling}`
+  | `time-${TimeOfDay}`
+  | `count-${Count}`
+  | `home-${HomeThing}`;
+
+/** Where a scene takes place: picks the colours of the scene art. */
+export type SceneSetting = "cafe" | "park" | "classroom" | "home" | "party" | "shop";
 
 export interface FeedbackCopy {
   title: string;
@@ -164,6 +195,10 @@ export interface DialogueNode {
   end?: boolean;
 }
 
+/**
+ * A scripted conversation. Lines and replies may contain `{name}`, which is
+ * replaced with the learner's first name when the scene is played.
+ */
 export interface DialogueScript {
   character: { name: string; role: string; initial: string };
   startNodeId: string;
@@ -179,6 +214,8 @@ export interface DialogueExercise extends ExerciseBase {
     description?: string;
     /** Things visible in the scene, e.g. a menu or departures board. */
     board?: { title: string; rows: string[][] };
+    /** Child mode: where the scene takes place (café when absent). */
+    setting?: SceneSetting;
   };
   script: DialogueScript;
 }

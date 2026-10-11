@@ -14,7 +14,7 @@ import type { ExerciseViewProps } from "./types";
 type Phase = "building" | "correct" | "almost";
 
 /** Tap words in order to build a sentence. Tap a placed word to take it back. */
-export function SentenceBuilderExercise({ exercise, onMistake, onSolved, onContinue, showXp }: ExerciseViewProps<SentenceEx>) {
+export function SentenceBuilderExercise({ exercise, onMistake, onSolved, onContinue, showXp, continueLabel }: ExerciseViewProps<SentenceEx>) {
   const age = useAge();
   const skin = useSkin();
   // Indices into `exercise.tokens`, so repeated words stay distinct.
@@ -144,7 +144,7 @@ export function SentenceBuilderExercise({ exercise, onMistake, onSolved, onConti
           xp={showXp ? xpForExercise(exercise, { mistakes, skipped: false }) : null}
           actions={
             <button type="button" onClick={onContinue} className={cx(skin.primary, "text-center")} autoFocus>
-              {skin.t.next}
+              {continueLabel ?? skin.t.next}
             </button>
           }
         />

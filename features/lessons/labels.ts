@@ -58,3 +58,10 @@ export function lessonTypes(lesson: Lesson): Exercise[] {
   const seen = new Set<ExerciseType>();
   return lesson.exercises.filter((e) => (seen.has(e.type) ? false : (seen.add(e.type), true)));
 }
+
+/** Child mode: how a step of a world is called — "Misja 3", "Powtórka" or "Wyzwanie". */
+export function childStepLabel(lesson: Lesson): string {
+  if (lesson.kind === "REVIEW") return "Powtórka";
+  if (lesson.kind === "CHECKPOINT") return "Wyzwanie";
+  return `Misja ${lesson.order}`;
+}

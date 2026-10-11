@@ -211,7 +211,7 @@ export const flightDelayed: Lesson = {
         },
         incorrect: {
           title: "Not quite — listen for the gate.",
-          note: "Kluczowe słowa są na końcu: **„proceed to gate B12”**. „Proceed” = przejdź, idź dalej.",
+          note: "Kluczowe słowa są na końcu komunikatu, po **„proceed to…”**. „Proceed” = przejdź, idź dalej.",
         },
       },
     },
