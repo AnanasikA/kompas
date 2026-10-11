@@ -6,71 +6,79 @@ import { lessonMaxXp } from "@/features/learning/engine/xp";
 import { useAge } from "@/features/theme/AgeScope";
 import { useAppStore } from "@/lib/store/app-store";
 import { cx, plural } from "@/lib/utils";
-import type { Lesson, Skill } from "@/types";
+import { LineIcon, type LineIconName } from "@/components/ui/LineIcon";
+import type { ExerciseType, Lesson } from "@/types";
 import { childStepLabel, exerciseName, lessonSkills, lessonTypes, skillCode, skillName } from "./labels";
-import { lessonScene, sceneColours, withName } from "./scenes";
+import { lessonScene, withName } from "./scenes";
+import { SceneIllustration } from "./SceneIllustration";
 import { useLessonContext } from "./useLessonContext";
 
 const CHIP_COLORS = ["bg-amber-soft", "bg-sky-soft", "bg-violet-soft", "bg-moss-soft"];
-const SKILL_TILE: Record<Skill, string> = {
-  VOCABULARY: "rounded-[14px] bg-moss-soft",
-  LISTENING: "rounded-full bg-sky-soft",
-  GRAMMAR: "rounded-md bg-amber-soft",
-  SPEAKING: "rounded-[50%_50%_50%_8px] bg-coral-soft",
-  READING: "rounded-[14px] bg-violet-soft",
+const TASK_ICON: Record<ExerciseType, LineIconName> = {
+  MATCHING: "task-matching",
+  IMAGE_CHOICE: "task-pictures",
+  LISTENING: "task-listening",
+  MULTIPLE_CHOICE: "task-quiz",
+  FILL_GAP: "task-gap",
+  SENTENCE_BUILDER: "task-sentence",
+  SPEAKING: "task-speaking",
+  DIALOGUE: "task-scene",
+};
+const TASK_TILE: Record<ExerciseType, string> = {
+  MATCHING: "bg-moss-soft",
+  IMAGE_CHOICE: "bg-moss-soft",
+  LISTENING: "bg-sky-soft",
+  MULTIPLE_CHOICE: "bg-amber-soft",
+  FILL_GAP: "bg-amber-soft",
+  SENTENCE_BUILDER: "bg-violet-soft",
+  SPEAKING: "bg-coral-soft",
+  DIALOGUE: "bg-amber-soft",
 };
 
 /** Child-mode lesson art: the place of the lesson's scene, its character and their first line. */
 function SceneArt({ lesson, learnerName }: { lesson: Lesson; learnerName: string | null | undefined }) {
   const dialogue = lessonScene(lesson);
-  const colours = sceneColours(dialogue);
   const board = dialogue?.scene.board;
   const firstLine = dialogue ? withName(dialogue.script.nodes[dialogue.script.startNodeId].line, learnerName) : null;
-  const cafe = (dialogue?.scene.setting ?? "cafe") === "cafe";
   return (
-    <div className="relative min-h-[390px] overflow-hidden rounded-[40px_40px_12px_40px] lg:min-h-[440px]" style={{ background: colours.wall }} aria-hidden>
-      <div className="absolute inset-x-0 bottom-0 h-[38%]" style={{ background: colours.floor }} />
-      <div className="absolute inset-x-0 bottom-[38%] h-[22px]" style={{ background: colours.edge }} />
-      {board && (
-        <div className="absolute left-[6%] top-[10%] flex w-[52%] flex-col gap-1.5 rounded-xl bg-[oklch(0.28_0.03_160)] p-3 font-mono text-[11px] text-[oklch(0.95_0.02_100)] sm:left-[8%] sm:top-[12%] sm:w-[44%] sm:p-4 sm:text-xs">
-          <div className="font-display text-lg font-extrabold text-[oklch(0.85_0.12_85)]">{board.title}</div>
-          {board.rows.map((row) => (
-            <div key={row[0]} className="flex justify-between gap-2">
-              <span>{row[0]}</span>
-              <span>{row[1]}</span>
-            </div>
-          ))}
-        </div>
-      )}
-      {!board && dialogue && (
-        <div className="absolute left-[8%] top-[12%] flex flex-col gap-1">
-          <span className="font-mono text-xs uppercase tracking-[0.12em] text-[oklch(0.40_0.03_265)]">{dialogue.scene.title}</span>
-          <span className="font-display text-[clamp(56px,8vw,96px)] font-extrabold leading-none text-[oklch(1_0_0/0.75)]">{lesson.kind ? "★" : lesson.order}</span>
-        </div>
-      )}
-      <div className="absolute bottom-[38%] right-[14%] h-[150px] w-[130px] rounded-t-[65px]" style={{ background: colours.body }} />
-      <div className="absolute size-20 rounded-full bg-[oklch(0.78_0.07_55)]" style={{ right: "calc(14% + 25px)", bottom: "calc(38% + 130px)" }} />
-      <div className="absolute h-[30px] w-[90px] rounded-[45px_45px_6px_6px] bg-[oklch(0.30_0.04_50)]" style={{ right: "calc(14% + 20px)", bottom: "calc(38% + 190px)" }} />
-      {dialogue && (
-        <div className="absolute rounded-full bg-card px-3 py-1.5 font-mono text-xs" style={{ right: "calc(14% + 10px)", bottom: "calc(38% - 44px)" }}>
-          {dialogue.script.character.name}
-        </div>
-      )}
+    <SceneIllustration
+      setting={dialogue?.scene.setting ?? "cafe"}
+      character={dialogue?.script.character.name}
+      className="min-h-[390px] rounded-[40px_40px_12px_40px] lg:aspect-[5/4] lg:min-h-0"
+    >
+      <div className="absolute left-[6%] top-[7%] flex max-w-[56%] flex-col items-start gap-2">
+        <span className="rounded-full bg-card/90 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.1em] shadow-[0_2px_6px_oklch(0.23_0.025_265/0.12)]">
+          {dialogue ? dialogue.scene.title : lesson.title}
+        </span>
+        {board && (
+          <div className="flex w-full min-w-[180px] flex-col gap-1.5 rounded-xl bg-[oklch(0.28_0.03_160)] p-3 font-mono text-[11px] text-[oklch(0.95_0.02_100)] shadow-[0_6px_14px_oklch(0.23_0.025_265/0.18)] sm:p-4 sm:text-xs">
+            <div className="font-display text-base font-extrabold text-[oklch(0.85_0.12_85)]">{board.title}</div>
+            {board.rows.map((row) => (
+              <div key={row[0]} className="flex justify-between gap-2">
+                <span>{row[0]}</span>
+                <span>{row[1]}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
       {firstLine && (
         <div
-          className="absolute hidden max-w-[46%] rounded-[18px_18px_4px_18px] bg-card px-4 py-3 font-display text-[17px] font-semibold shadow-[0_8px_20px_oklch(0.23_0.025_265/0.15)] sm:block"
-          style={{ right: "calc(14% + 145px)", bottom: "calc(38% + 160px)" }}
+          className={cx(
+            "absolute rounded-[18px_18px_4px_18px] bg-card px-4 py-3 font-display text-[17px] font-semibold leading-snug shadow-[0_8px_20px_oklch(0.23_0.025_265/0.15)]",
+            // With a board on the left the line goes top right, and on a phone, where both do not fit, the board wins.
+            board ? "right-[5%] top-[7%] hidden max-w-[38%] sm:block" : "bottom-[56%] right-[30%] max-w-[52%]",
+          )}
         >
           {firstLine}
         </div>
       )}
-      {cafe && (
-        <>
-          <div className="absolute left-[12%] hidden h-[50px] w-11 rounded-b-[18px] bg-[oklch(0.97_0.01_85)] lg:block" style={{ bottom: "calc(38% + 22px)" }} />
-          <div className="absolute hidden h-[34px] w-[60px] rounded-[30px_30px_4px_4px] bg-[oklch(0.80_0.10_75)] lg:block" style={{ left: "calc(12% + 52px)", bottom: "calc(38% + 22px)" }} />
-        </>
+      {dialogue && (
+        <div className="absolute bottom-4 right-[6%] rounded-full bg-card px-3 py-1.5 font-mono text-xs shadow-[0_2px_6px_oklch(0.23_0.025_265/0.15)]">
+          {dialogue.script.character.name}
+        </div>
       )}
-    </div>
+    </SceneIllustration>
   );
 }
 
@@ -248,7 +256,7 @@ export function LessonStart({ lessonId }: { lessonId: string }) {
           {childStepLabel(lesson)} · {unit.title}
         </div>
       </div>
-      <div className="mx-auto grid grid-cols-1 w-full max-w-[1280px] flex-1 items-stretch gap-6 px-[clamp(20px,3vw,40px)] pb-10 lg:grid-cols-2">
+      <div className="mx-auto grid grid-cols-1 w-full max-w-[1280px] flex-1 items-center gap-6 px-[clamp(20px,3vw,40px)] pb-10 lg:grid-cols-2">
         <SceneArt lesson={lesson} learnerName={learnerName} />
         <div className="flex flex-col justify-center gap-[22px]">
           <div className="flex flex-col gap-2.5">
@@ -275,13 +283,9 @@ export function LessonStart({ lessonId }: { lessonId: string }) {
           <ul className="m-0 flex list-none flex-wrap gap-x-4 gap-y-3 p-0">
             {lessonTypes(lesson).map((e) => (
               <li key={e.id} className="flex w-[64px] flex-col items-center gap-1.5 text-center">
-                {e.type === "DIALOGUE" ? (
-                  <span className="m-[3px] size-[38px] rotate-45 rounded-lg bg-amber" aria-hidden />
-                ) : (
-                  <span className={cx("grid size-11 place-items-center font-mono text-[11px]", SKILL_TILE[e.skill])} aria-hidden>
-                    {skillCode(e.skill)}
-                  </span>
-                )}
+                <span className={cx("grid size-12 place-items-center rounded-2xl", TASK_TILE[e.type])} aria-hidden>
+                  <LineIcon name={TASK_ICON[e.type]} size={28} />
+                </span>
                 <span className="text-xs">{exerciseName("CHILD", e)}</span>
               </li>
             ))}

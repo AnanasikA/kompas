@@ -75,6 +75,13 @@ import {
   ShoppingBag,
   Horse,
   Alarm,
+  Image as ImageIcon,
+  Headphones,
+  Question,
+  PencilSimpleLine,
+  Cards,
+  Microphone,
+  ChatsCircle,
 } from "@phosphor-icons/react/dist/ssr";
 import type { Icon } from "@phosphor-icons/react";
 
@@ -142,6 +149,8 @@ const Mum = person(false, <path d="M72 96c0-34 24-52 56-52s56 18 56 52c-18-2-40-
 const Dad = person(false, <path d="M74 84c6-26 28-40 54-40s48 14 54 40c-34-10-74-10-108 0z" fill="currentColor" stroke="none" />);
 const Sister = person(true, <><circle cx="60" cy="86" r="18" /><circle cx="196" cy="86" r="18" /><path d="M74 84c6-26 28-40 54-40s48 14 54 40c-34-10-74-10-108 0z" {...SOFT} /></>);
 const Brother = person(true, <path d="M74 80c6-24 28-36 54-36s48 12 54 36zM182 80h34" />);
+const Teacher = person(false, <><path d="M72 96c0-34 24-52 56-52s56 18 56 52c-18-2-40-14-48-30c-10 18-40 30-64 30z" {...SOFT} /><circle cx="128" cy="36" r="16" />{glasses}</>);
+const Coach = person(false, <><path d="M74 80c6-24 28-36 54-36s48 12 54 36zM182 80h34" /><path d="M128 172v24" /><circle cx="128" cy="204" r="10" /></>);
 const Grandma = person(false, <><circle cx="128" cy="36" r="18" />{glasses}</>);
 const Grandpa = person(false, <>{glasses}<path d="M76 72c-4 10-4 20 0 28M180 72c4 10 4 20 0 28" /></>);
 
@@ -269,6 +278,8 @@ type Entry = readonly [Icon | Custom, string];
 const ICONS = {
   // people
   mum: [Mum, COLOR.pink],
+  teacher: [Teacher, COLOR.blue],
+  coach: [Coach, COLOR.red],
   dad: [Dad, COLOR.blue],
   sister: [Sister, COLOR.violet],
   brother: [Brother, COLOR.green],
@@ -377,6 +388,15 @@ const ICONS = {
   chest: [TreasureChest, COLOR.brown],
   lighthouse: [Lighthouse, COLOR.red],
   box: [Package, COLOR.brown],
+  // kinds of exercises
+  "task-matching": [PuzzlePiece, COLOR.green],
+  "task-pictures": [ImageIcon, COLOR.green],
+  "task-listening": [Headphones, COLOR.sky],
+  "task-quiz": [Question, COLOR.amber],
+  "task-gap": [PencilSimpleLine, COLOR.amber],
+  "task-sentence": [Cards, COLOR.violet],
+  "task-speaking": [Microphone, COLOR.red],
+  "task-scene": [ChatsCircle, COLOR.orange],
   // sea
   ship: [Sailboat, COLOR.brown],
   boat: [Boat, COLOR.brown],

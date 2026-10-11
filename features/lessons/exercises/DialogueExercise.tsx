@@ -10,7 +10,8 @@ import { audioPlayer } from "@/lib/services/tts";
 import { cx } from "@/lib/utils";
 import type { DialogueExercise as DialogueEx, DialogueOption } from "@/types";
 import { useAppStore } from "@/lib/store/app-store";
-import { sceneColours, withName } from "../scenes";
+import { withName } from "../scenes";
+import { SceneIllustration } from "../SceneIllustration";
 import type { ExerciseViewProps } from "./types";
 
 const VOICE = { lang: "en-GB", rate: 0.9 };
@@ -22,14 +23,14 @@ function speak(text: string) {
 }
 
 /** Scene illustration (the café from the prototype, or another place): the character and an optional board. */
+/** Left column of the child scene: the board (if any) and the character's name; the picture is behind. */
 function SceneFigure({ exercise }: { exercise: DialogueEx }) {
   const { character } = exercise.script;
   const board = exercise.scene.board;
-  const colours = sceneColours(exercise);
   return (
     <div className={cx("relative md:min-h-0", board ? "min-h-[220px]" : "min-h-[60px]")}>
       {board && (
-        <div className="absolute left-[12%] top-[8%] flex w-[62%] flex-col gap-1 rounded-[10px] bg-[oklch(0.28_0.03_160)] px-3.5 py-3 font-mono text-[11px] text-[oklch(0.95_0.02_100)]">
+        <div className="absolute left-[8%] top-[6%] flex w-[70%] flex-col gap-1 rounded-[10px] bg-[oklch(0.28_0.03_160)] px-3.5 py-3 font-mono text-[11px] text-[oklch(0.95_0.02_100)] shadow-[0_6px_14px_oklch(0.23_0.025_265/0.18)] md:w-[62%]">
           <div className="font-display text-[15px] font-extrabold text-[oklch(0.85_0.12_85)]">{board.title}</div>
           {board.rows.map((row) => (
             <div key={row[0]} className="flex justify-between">
@@ -39,13 +40,7 @@ function SceneFigure({ exercise }: { exercise: DialogueEx }) {
           ))}
         </div>
       )}
-      <div aria-hidden className="hidden md:block">
-        <div className="absolute bottom-[26%] left-1/2 h-[170px] w-[150px] -translate-x-1/2 rounded-t-[75px]" style={{ background: colours.body }} />
-        <div className="absolute left-1/2 h-[100px] w-[110px] -translate-x-1/2 rounded-b-[20px] bg-[oklch(0.97_0.01_85)]" style={{ bottom: "calc(26% + 70px)" }} />
-        <div className="absolute left-1/2 size-[92px] -translate-x-1/2 rounded-full bg-[oklch(0.78_0.07_55)]" style={{ bottom: "calc(26% + 150px)" }} />
-        <div className="absolute left-1/2 h-[34px] w-[100px] -translate-x-1/2 rounded-[50px_50px_8px_8px] bg-[oklch(0.30_0.04_50)]" style={{ bottom: "calc(26% + 218px)" }} />
-      </div>
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-card px-3 py-1.5 font-mono text-xs md:bottom-[calc(26%-50px)]">
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-card px-3 py-1.5 font-mono text-xs shadow-[0_2px_6px_oklch(0.23_0.025_265/0.15)]">
         {character.name} · {character.role}
       </div>
     </div>
@@ -252,9 +247,13 @@ export function DialogueExercise({ exercise, onMistake, onSolved, onContinue, sh
           </div>
           {progress}
         </div>
-        <div className="relative grid grid-cols-1 overflow-hidden rounded-[36px] md:min-h-[520px] md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]" style={{ background: sceneColours(exercise).wall }}>
-          <div className="absolute inset-x-0 bottom-0 hidden h-[26%] md:block" style={{ background: sceneColours(exercise).floor }} aria-hidden />
-          <div className="absolute inset-x-0 bottom-[26%] hidden h-[18px] md:block" style={{ background: sceneColours(exercise).edge }} aria-hidden />
+        <SceneIllustration
+          setting={exercise.scene.setting ?? "cafe"}
+          character={exercise.script.character.name}
+          figureClassName="hidden md:flex left-[4%] h-[58%] md:w-[36%] justify-center"
+          flip
+          className="grid grid-cols-1 rounded-[36px] md:min-h-[520px] md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]"
+        >
           <SceneFigure exercise={exercise} />
           <div className="relative flex min-h-[380px] flex-col gap-3 bg-card/72 p-[22px] backdrop-blur-[6px]">
             {bubbles}
@@ -263,7 +262,7 @@ export function DialogueExercise({ exercise, onMistake, onSolved, onContinue, sh
             {choices}
             {done}
           </div>
-        </div>
+        </SceneIllustration>
       </div>
     );
   }
