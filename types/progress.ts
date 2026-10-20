@@ -139,6 +139,19 @@ export interface AppState {
   round: TopicRound | null;
   /** Lesson to show the level-up screen for, set when a lesson raised the level. */
   pendingReward: { lessonId: string; fromLevel: number; toLevel: number } | null;
+  /** Real-life missions: what the child ticked off and whether a parent confirmed it (by exercise id). */
+  realTasks?: Record<string, RealTaskRecord>;
   /** Test accounts only: which edition of the account this progress belongs to (data/demo/accounts). */
   demoEdition?: number;
+}
+
+/** A real-life mission (REAL_TASK step) as the child and a parent left it. */
+export interface RealTaskRecord {
+  lessonId: string;
+  /** Indexes of the steps the child ticked. */
+  ticked: number[];
+  /** The child says it is done; waiting for a parent. */
+  doneAt?: string;
+  /** A parent confirmed it: the stamp is in the passport. */
+  confirmedAt?: string;
 }

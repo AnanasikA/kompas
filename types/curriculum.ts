@@ -14,7 +14,10 @@ export type ExerciseType =
   | "FILL_GAP"
   | "MATCHING"
   | "SPEAKING"
-  | "DIALOGUE";
+  | "DIALOGUE"
+  | "STORY"
+  | "CONVERSATION"
+  | "REAL_TASK";
 
 /** Something that can be played: a recording when `src` exists, TTS otherwise. */
 export interface AudioSource {
@@ -23,6 +26,8 @@ export interface AudioSource {
   src?: string;
   lang?: string;
   rate?: number;
+  /** Voice height for TTS (1 = normal): lets characters sound different. */
+  pitch?: number;
 }
 
 export type Colour = "red" | "blue" | "green" | "yellow" | "orange" | "pink" | "purple" | "black" | "white" | "brown";
@@ -220,7 +225,90 @@ export interface DialogueExercise extends ExerciseBase {
   script: DialogueScript;
 }
 
+/* ---------- the mission format: story → conversation → real-world task ---------- */
+
+/** The people of Kompas town (art in /public/characters). */
+export type CharacterId = "leo" | "mia" | "bell" | "grandma";
+
+/** One picture of a story: who is there, what they say, and what happens (in Polish). */
+export interface StoryPanel {
+  id: string;
+  setting: SceneSetting;
+  /** Character pictures shown in the panel: file names in /public/characters, e.g. "leo-wave". */
+  cast: string[];
+  /** Short narration in Polish, e.g. "Rano. Wysiadasz z pociągu w miasteczku Kompas." */
+  caption?: string;
+  lines: { who: CharacterId; en: string; pl: string }[];
+}
+
+/** Watch and listen: a short illustrated story where the new phrases are used for real. No questions. */
+export interface StoryExercise extends ExerciseBase {
+  type: "STORY";
+  title: string;
+  panels: StoryPanel[];
+}
+
+/**
+ * What the learner may say. Each phrase is matched on words, not spelling:
+ * "good morning" accepts "Good morning, Leo!". `*` alone accepts any answer.
+ */
+export interface ConversationAnswer {
+  says: string[];
+  /** The next turn, or null when this answer ends the conversation. */
+  next: string | null;
+  /** What is said back before the next turn (in English, read aloud). */
+  reply?: string;
+  /** Who says the reply, when it is not the character asking (e.g. Mia barks back). */
+  replyBy?: CharacterId;
+}
+
+/** A turn: the character speaks, the learner answers in their own words (voice or typing). */
+export interface ConversationTurn {
+  who: CharacterId;
+  /** Character picture for this turn, e.g. "leo-laugh". */
+  pose: string;
+  line: string;
+  /** Polish meaning, shown on request. */
+  pl: string;
+  answers: ConversationAnswer[];
+  /** Answers that are real English but wrong here: the character reacts (English, aloud) and a hint explains (Polish). */
+  misses?: { says: string[]; reply: string; hint: string }[];
+  /** Sentence starter shown after a first miss, e.g. "Good morning, ___!". */
+  frame: string;
+  /** A good answer, shown after a second miss for the learner to repeat. */
+  model: string;
+  conceptId: string;
+}
+
+export interface ConversationExercise extends ExerciseBase {
+  type: "CONVERSATION";
+  title: string;
+  /** What to do, in Polish. */
+  goal: string;
+  setting: SceneSetting;
+  start: string;
+  turns: Record<string, ConversationTurn>;
+  /** The last thing the character says when the conversation is done. */
+  ending: string;
+}
+
+/** A mission for real life, away from the screen. A parent confirms it; the stamp goes to the passport. */
+export interface RealTaskExercise extends ExerciseBase {
+  type: "REAL_TASK";
+  title: string;
+  /** Why and what, in Polish. */
+  intro: string;
+  /** Steps to tick off, in Polish (may contain **bold** English). */
+  steps: string[];
+  /** Phrases to use, with their meaning. */
+  phrases: { en: string; pl: string }[];
+  stamp: { id: string; label: string; icon: string };
+}
+
 export type Exercise =
+  | StoryExercise
+  | ConversationExercise
+  | RealTaskExercise
   | MultipleChoiceExercise
   | ImageChoiceExercise
   | ListeningExercise

@@ -1,6 +1,6 @@
 import type { Concept, Unit } from "@/types";
 import { buildUnit } from "../../helpers";
-import { build, gap, lesson, listen, matching, pictures, quiz, rule, say, scene, wordConcepts, words } from "../kit";
+import { build, conversation, gap, lesson, listen, matching, pictures, quiz, realTask, rule, say, scene, story, wordConcepts, words } from "../kit";
 
 /**
  * CHILD · Pre-A1 · World 1: HELLO WORLD
@@ -167,7 +167,7 @@ const G = {
 };
 
 const rules: Concept[] = [
-  rule(G.greeting, "good morning / good night", "powitanie a pora dnia", "Rano: **Good morning**. Po południu: **Good afternoon**. Wieczorem na powitanie: **Good evening**. **Good night** mówimy, idąc spać.", "Good evening, Grandma!", "VOCABULARY",
+  rule(G.greeting, "good morning / good night", "powitanie a pora dnia", "Rano: **Good morning**. Po południu: **Good afternoon**. Wieczorem na powitanie: **Good evening**. **Good night** mówimy przed snem.", "Good evening, Grandma!", "VOCABULARY",
     quiz(`${G.greeting}.check`, { prompt: "Jest rano. Wchodzisz do klasy. Co powiesz?", answer: "Good morning!", wrong: ["Good night!", "Good evening!"], conceptId: G.greeting, ok: "Rano mówimy **Good morning**.", hint: "Pomyśl, jaka jest pora dnia." })),
   rule(G.iAm, "I am = I'm", "ja jestem", "Mówiąc o sobie: **I am**, w skrócie **I'm**. Z **I** zawsze **am**.", "I'm Mia.", "GRAMMAR",
     gap(`${G.iAm}.check`, { sentence: "I ___ Leo.", translation: "Jestem Leo.", answer: "am", wrong: ["is", "are"], conceptId: G.iAm, ok: "**I am** = jestem.", hint: "Z **I** łączy się zawsze to samo słowo." })),
@@ -189,7 +189,7 @@ const rules: Concept[] = [
     quiz(`${G.sorry}.check`, { prompt: "Przez przypadek popychasz kogoś na korytarzu. Co mówisz?", answer: "Sorry!", wrong: ["Excuse me…", "Thanks!"], conceptId: G.sorry, ok: "Gdy coś zrobimy źle: **Sorry!**", hint: "Coś poszło nie tak z Twojej winy — które „przepraszam” pasuje?" })),
 ];
 
-/* ---------- mission 1: Hello! ---------- */
+/* ---------- mission 1: Hello! (new format) ---------- */
 
 const hello = lesson({
   unitId: UNIT_ID,
@@ -198,208 +198,310 @@ const hello = lesson({
   title: "Hello!",
   canDo: "Po tej misji przywitasz się o każdej porze dnia i powiesz „proszę” i „dziękuję”.",
   outcome: "Teraz potrafisz przywitać się po angielsku.",
-  minutes: 6,
+  minutes: 10,
   keyPhrases: ["Hello!", "Good morning!", "Please.", "Thank you."],
   words: Object.values(w1),
   exercises: [
-    matching("hw1.words", [w1.hello, w1.yes, w1.no, w1.please, w1["thank-you"]], "Połącz pary: pierwsze słówka"),
-    pictures("hw1.morning", {
-      word: w1["good-morning"],
-      items: [
-        ["time-morning", "good morning"],
-        ["time-afternoon", "good afternoon"],
-        ["time-evening", "good evening"],
-        ["time-night", "good night"],
-      ],
-      ok: "**good morning** mówimy rano, kiedy słońce dopiero wstaje.",
-      hint: "Poszukaj obrazka, na którym słońce dopiero wschodzi.",
-    }),
-    listen("hw1.listen", {
-      say: "Good night, Mum!",
-      speaker: { name: "Leo", caption: "Leo mówi coś do mamy" },
-      question: "Kiedy Leo to mówi?",
-      items: [
-        ["time-night", "good night"],
-        ["time-morning", "good morning"],
-        ["time-afternoon", "good afternoon"],
-        ["time-evening", "good evening"],
-      ],
-      conceptId: w1["good-night"].id,
-      ok: "**Good night** = dobranoc. Mówimy tak, idąc spać.",
-      hint: "Posłuchaj jeszcze raz pierwszych dwóch słów.",
-    }),
-    quiz("hw1.evening", {
-      prompt: "Jest wieczór. Wchodzisz do sklepu. Co powiesz?",
-      answer: "Good evening!",
-      wrong: [
-        ["Good night!", "**Good night** mówimy, idąc spać — nie na powitanie."],
-        ["Good morning!", "**Good morning** mówimy rano."],
-      ],
+    story("hw1.story", {
+      title: "Witaj w Kompasie",
       conceptId: G.greeting,
-      ok: "Wieczorem na powitanie: **Good evening**.",
-      hint: "Pomyśl, jaka jest pora dnia.",
-    }),
-    gap("hw1.thanks", {
-      sentence: "Thank ___!",
-      translation: "Dziękuję!",
-      answer: "you",
-      wrong: [
-        ["me", "**Thank me** znaczyłoby „podziękuj mnie”. Dziękujesz komuś innemu."],
-        ["your", "**your** = twój. Szukamy słowa „ty”."],
+      panels: [
+        {
+          id: "arrive",
+          setting: "park",
+          cast: ["leo-wave", "mia"],
+          caption: "Rano. Przyjeżdżasz do miasteczka Kompas. Ktoś macha do Ciebie z daleka.",
+          lines: [
+            { who: "leo", en: "Hello! Good morning!", pl: "Cześć! Dzień dobry!" },
+            { who: "leo", en: "I'm Leo. And this is Mia.", pl: "Jestem Leo. A to jest Mia." },
+            { who: "mia", en: "Woof! Woof!", pl: "Hau! Hau!" },
+          ],
+        },
+        {
+          id: "grandma",
+          setting: "home",
+          cast: ["grandma", "leo"],
+          caption: "Po południu idziecie do babci Leo. Babcia upiekła ciasteczka.",
+          lines: [
+            { who: "leo", en: "Good afternoon, Grandma!", pl: "Dzień dobry, babciu!" },
+            { who: "grandma", en: "Good afternoon, Leo! A cookie?", pl: "Dzień dobry, Leo! Ciasteczko?" },
+            { who: "leo", en: "Yes, please!", pl: "Tak, poproszę!" },
+            { who: "grandma", en: "Here you are.", pl: "Proszę bardzo." },
+            { who: "leo", en: "Thank you, Grandma!", pl: "Dziękuję, babciu!" },
+          ],
+        },
+        {
+          id: "cookie-for-mia",
+          setting: "home",
+          cast: ["grandma", "mia"],
+          caption: "Mia też chce ciasteczko. Ale ciasteczka nie są dla piesków.",
+          lines: [
+            { who: "grandma", en: "A cookie for Mia? No, no!", pl: "Ciasteczko dla Mii? Nie, nie!" },
+            { who: "mia", en: "Woof…", pl: "Hau… (smutno)" },
+          ],
+        },
+        {
+          id: "evening",
+          setting: "park",
+          cast: ["bell", "leo"],
+          caption: "Wieczorem wracacie przez park. Na ławce siedzi pani Bell, nauczycielka angielskiego.",
+          lines: [
+            { who: "leo", en: "Good evening, Ms Bell!", pl: "Dobry wieczór, pani Bell!" },
+            { who: "bell", en: "Good evening, Leo!", pl: "Dobry wieczór, Leo!" },
+          ],
+        },
+        {
+          id: "night",
+          setting: "home",
+          cast: ["leo-wave", "mia-sleep"],
+          caption: "Leo odprowadza Cię pod Twój nowy dom. Mia już prawie śpi.",
+          lines: [
+            { who: "leo", en: "Good night, {name}!", pl: "Dobranoc, {name}!" },
+            { who: "mia", en: "Woof…", pl: "Hau… (sennie)" },
+          ],
+        },
       ],
-      conceptId: w1["thank-you"].id,
-      skill: "VOCABULARY",
-      ok: "**Thank you** = dziękuję.",
-      hint: "Dziękujesz komuś — szukamy słowa „ty”.",
     }),
-    build("hw1.build", {
-      pl: "Dzień dobry, Leo! (rano)",
-      tokens: ["morning,", "Leo!", "Good", "night,"],
-      solution: "Good morning, Leo!",
-      conceptId: w1["good-morning"].id,
-      tokenHints: { "night,": "**Good night** = dobranoc. Rano mówimy inaczej." },
-      ok: "**Good morning** = dzień dobry (rano).",
-      hint: "Najpierw **Good**, potem pora dnia, na końcu imię.",
-    }),
-    say("hw1.say", {
-      target: "Hello! Good morning!",
-      translation: "„Cześć! Dzień dobry!”",
-      conceptId: w1["good-morning"].id,
-      tip: "**morning** czytamy jak **„MOR-ning”** — mocno na pierwszą część.",
-      tipAudio: "morning",
-    }),
-    scene("hw1.scene", {
-      title: "W parku",
-      prompt: "Przywitaj się z Leo",
+    conversation("hw1.talk", {
+      title: "Od rana do wieczora",
+      goal: "Przywitaj się z Leo, Mią i panią Bell. Odpowiadaj **na głos** po angielsku.",
       setting: "park",
-      character: { name: "Leo", role: "kolega z parku" },
       conceptId: G.greeting,
-      start: "hi",
-      nodes: {
-        hi: ["Good morning!", [
-          ["Good morning, Leo!", "apple"],
-          ["Good night!", null, "Jest rano! **Good night** mówimy wieczorem, idąc spać.", G.greeting],
-          ["Thank you!", null, "Leo się z Tobą wita. Najpierw też się przywitaj.", w1.hello.id],
-        ]],
-        apple: ["Do you want an apple?", [
-          ["Yes, please!", "here"],
-          ["No, thank you.", "ok"],
-          ["Yes!", null, "Dodaj magiczne słowo — będzie grzecznie.", w1.please.id],
-        ]],
-        here: ["Here you are!", [
-          ["Thank you!", "welcome"],
-          ["Good morning!", null, "Leo daje Ci jabłko. Co mówimy, gdy coś dostajemy?", w1["thank-you"].id],
-        ]],
-        welcome: ["You're welcome!"],
-        ok: ["OK! See you!"],
+      start: "morning",
+      turns: {
+        morning: {
+          who: "leo",
+          pose: "leo-happy",
+          line: "Hello! Good morning!",
+          pl: "Cześć! Dzień dobry! (jest rano)",
+          answers: [{ says: ["good morning", "hello", "hi"], next: "mia" }],
+          misses: [
+            { says: ["good night"], reply: "Good night? It's morning!", hint: "**Good night** mówimy przed snem. Rano mówimy **Good morning**." },
+            { says: ["good evening", "good afternoon"], reply: "Hmm, it's morning!", hint: "Jest rano — powiedz **Good morning**." },
+          ],
+          frame: "Good ___, Leo!",
+          model: "Good morning, Leo!",
+          conceptId: G.greeting,
+        },
+        mia: {
+          who: "leo",
+          pose: "leo-laugh",
+          line: "This is Mia, my dog. Say hello to Mia!",
+          pl: "To jest Mia, mój pies. Przywitaj się z Mią!",
+          answers: [{ says: ["hello", "hi", "good morning"], next: "apple", reply: "Woof! Woof!", replyBy: "mia" }],
+          misses: [{ says: ["good night"], reply: "Good night? Mia is not sleeping!", hint: "Mia nie idzie spać. Przywitaj się: **Hello, Mia!**" }],
+          frame: "Hello, ___!",
+          model: "Hello, Mia!",
+          conceptId: w1.hello.id,
+        },
+        apple: {
+          who: "leo",
+          pose: "leo-happy",
+          line: "Do you want an apple?",
+          pl: "Chcesz jabłko?",
+          answers: [
+            { says: ["yes please"], next: "here" },
+            { says: ["no thank you"], next: "evening", reply: "OK!" },
+          ],
+          misses: [
+            { says: ["yes"], reply: "Yes… and the magic word?", hint: "Dodaj magiczne słowo **please**: **Yes, please!**" },
+            { says: ["no"], reply: "No… and the magic words?", hint: "Grzeczniej będzie: **No, thank you.**" },
+          ],
+          frame: "Yes, ___!",
+          model: "Yes, please!",
+          conceptId: w1.please.id,
+        },
+        here: {
+          who: "leo",
+          pose: "leo-happy",
+          line: "Here you are!",
+          pl: "Proszę bardzo! (Leo podaje Ci jabłko)",
+          answers: [{ says: ["thank you"], next: "evening", reply: "You're welcome!" }],
+          misses: [{ says: ["please"], reply: "Hmm?", hint: "Kiedy coś dostajesz, mówimy **Thank you!**" }],
+          frame: "Thank ___!",
+          model: "Thank you, Leo!",
+          conceptId: w1["thank-you"].id,
+        },
+        evening: {
+          who: "bell",
+          pose: "bell-smile",
+          line: "Oh! Good evening!",
+          pl: "(Jest już wieczór. Spotykacie panią Bell.) O! Dobry wieczór!",
+          answers: [{ says: ["good evening"], next: "night" }],
+          misses: [
+            { says: ["good night"], reply: "Good night? We are not in bed!", hint: "**Good night** mówimy przed snem. Na powitanie wieczorem: **Good evening**." },
+            { says: ["good morning", "good afternoon"], reply: "Look, it's evening!", hint: "Jest wieczór — powiedz **Good evening**." },
+            { says: ["hello", "hi"], reply: "Hello! And in the evening we say…?", hint: "Wieczorem witamy się tak: **Good evening, Ms Bell!**" },
+          ],
+          frame: "Good ___, Ms Bell!",
+          model: "Good evening, Ms Bell!",
+          conceptId: w1["good-evening"].id,
+        },
+        night: {
+          who: "leo",
+          pose: "leo-shy",
+          line: "It's late. Good night, {name}!",
+          pl: "Jest późno. Dobranoc, {name}!",
+          answers: [{ says: ["good night", "bye", "good bye"], next: null }],
+          misses: [
+            { says: ["good morning", "good evening", "hello", "hi"], reply: "No, no, it's time for bed!", hint: "Idziesz spać — powiedz **Good night!**" },
+          ],
+          frame: "Good ___, Leo!",
+          model: "Good night, Leo!",
+          conceptId: w1["good-night"].id,
+        },
       },
-      done: "Scenka zaliczona! Leo już Cię zna.",
+      ending: "Sleep well! See you tomorrow!",
+    }),
+    realTask("hw1.real", {
+      title: "Cały dzień po angielsku",
+      intro: "Przez cały dzień witaj się i dziękuj po angielsku. Zobacz, kto się uśmiechnie!",
+      steps: [
+        "Rano powiedz komuś w domu **Good morning!**",
+        "Przy jedzeniu powiedz **please** i **thank you**.",
+        "Wieczorem, idąc spać, powiedz **Good night!**",
+      ],
+      phrases: [
+        { en: "Good morning!", pl: "Dzień dobry! (rano)" },
+        { en: "Please.", pl: "Proszę. (kiedy o coś prosisz)" },
+        { en: "Thank you!", pl: "Dziękuję!" },
+        { en: "Good night!", pl: "Dobranoc!" },
+      ],
+      stamp: { id: "hw-hello", label: "Pierwsze słowa", icon: "wave" },
+      conceptId: G.greeting,
     }),
   ],
 });
 
-/* ---------- mission 2: What's your name? ---------- */
+/* ---------- mission 2: What's your name? (new format) ---------- */
 
 const name = lesson({
   unitId: UNIT_ID,
   id: "l02-name",
   order: 2,
   title: "What's your name?",
-  canDo: "Po tej misji powiesz, jak masz na imię, i zapytasz o imię kolegę.",
+  canDo: "Po tej misji powiesz, jak masz na imię, i zapytasz kogoś, jak ma na imię.",
   outcome: "Teraz potrafisz się przedstawić.",
-  minutes: 6,
+  minutes: 10,
   keyPhrases: ["What's your name?", "My name is…", "I'm…", "Nice to meet you!"],
   words: Object.values(w2),
   exercises: [
-    matching("hw2.words", [w2.name, w2.my, w2.your, w2.boy, w2.girl]),
-    quiz("hw2.meaning", {
-      prompt: "Co znaczy “What's your name?”",
-      answer: "Jak masz na imię?",
-      wrong: [
-        ["Ile masz lat?", "To pytanie poznasz w misji 6: **How old are you?**"],
-        ["Jak się masz?", "To jest **How are you?** — poznasz je w misji 5."],
-      ],
-      conceptId: w2["whats-your-name"].id,
-      skill: "VOCABULARY",
-      eyebrow: "CO TO ZNACZY?",
-      ok: "**What's your name?** = Jak masz na imię?",
-      hint: "Ważne słowo w pytaniu to **name**.",
-    }),
-    listen("hw2.listen", {
-      say: "Hi! I'm Mia. What's your name?",
-      speaker: { name: "Mia", caption: "Nowa koleżanka z klasy" },
-      question: "Jak ma na imię nowa koleżanka?",
-      answer: "Mia",
-      wrong: ["Leo", "Ola", "Emma"],
-      conceptId: G.iAm,
-      ok: "**I'm Mia** = Jestem Mia.",
-      hint: "Imię pada zaraz po **I'm…**",
-    }),
-    gap("hw2.my-name", {
-      sentence: "My ___ is Leo.",
-      translation: "Mam na imię Leo.",
-      answer: "name",
-      wrong: [
-        ["your", "**your** = twój. Tu mówisz o sobie."],
-        ["is", "**is** już jest w zdaniu."],
-      ],
-      conceptId: w2["my-name-is"].id,
-      skill: "VOCABULARY",
-      ok: "**My name is…** = Mam na imię…",
-      hint: "Brakuje słowa „imię”.",
-    }),
-    gap("hw2.i-am", {
-      sentence: "I ___ Mia.",
-      translation: "Jestem Mia.",
-      answer: "am",
-      wrong: [
-        ["is", "**is** pasuje do he / she / it."],
-        ["are", "**are** pasuje do **you**."],
-      ],
-      conceptId: G.iAm,
-      ok: "**I am** (w skrócie **I'm**) = jestem.",
-      hint: "Z **I** łączy się zawsze to samo słowo.",
-    }),
-    build("hw2.build", {
-      pl: "Miło cię poznać!",
-      tokens: ["to", "Nice", "meet", "you!", "me!"],
-      solution: "Nice to meet you!",
-      conceptId: w2["nice-to-meet-you"].id,
-      tokenHints: { "me!": "Poznajesz kogoś innego — więc „ciebie”, nie „mnie”." },
-      ok: "**Nice to meet you!** = Miło cię poznać!",
-      hint: "Zacznij od **Nice**.",
-    }),
-    say("hw2.say", {
-      target: "What's your name?",
-      translation: "„Jak masz na imię?”",
-      conceptId: w2["whats-your-name"].id,
-      tip: "**What's** to skrót od **What is**. Czytaj krótko: **„łots”**.",
-      tipAudio: "What's your name?",
-    }),
-    scene("hw2.scene", {
+    story("hw2.story", {
       title: "Pierwszy dzień w szkole",
-      prompt: "Poznaj nową koleżankę",
+      conceptId: w2["whats-your-name"].id,
+      panels: [
+        {
+          id: "class",
+          setting: "classroom",
+          cast: ["bell", "leo"],
+          caption: "Rano idziesz z Leo do szkoły. Pani Bell bawi się z klasą w poznawanie się — wszyscy udają, że widzą się pierwszy raz.",
+          lines: [
+            { who: "bell", en: "Hello! I'm Ms Bell. What's your name?", pl: "Cześć! Jestem pani Bell. Jak masz na imię?" },
+            { who: "leo", en: "My name is Leo.", pl: "Mam na imię Leo." },
+            { who: "bell", en: "Nice to meet you, Leo!", pl: "Miło cię poznać, Leo!" },
+          ],
+        },
+        {
+          id: "mia",
+          setting: "classroom",
+          cast: ["bell", "mia"],
+          caption: "Mia przyszła razem z wami. Pani Bell jest zaskoczona.",
+          lines: [
+            { who: "bell", en: "Oh! And who is this?", pl: "O! A kto to jest?" },
+            { who: "leo", en: "This is Mia. Mia is my dog.", pl: "To jest Mia. Mia to mój piesek." },
+            { who: "bell", en: "Is Mia a boy or a girl?", pl: "Mia to chłopiec czy dziewczynka?" },
+            { who: "leo", en: "Mia is a girl!", pl: "Mia to dziewczynka!" },
+            { who: "mia", en: "Woof!", pl: "Hau!" },
+          ],
+        },
+        {
+          id: "you",
+          setting: "classroom",
+          cast: ["leo-point", "bell"],
+          caption: "Leo pokazuje na Ciebie.",
+          lines: [
+            { who: "leo", en: "Ms Bell, look! Someone new!", pl: "Pani Bell, proszę spojrzeć! Ktoś nowy!" },
+            { who: "bell", en: "Oh, hello! What's your name?", pl: "O, cześć! Jak masz na imię?" },
+          ],
+        },
+      ],
+    }),
+    conversation("hw2.talk", {
+      title: "Pani Bell",
+      goal: "Przedstaw się pani Bell i zapytaj ją, jak ma na imię. Odpowiadaj **na głos**.",
       setting: "classroom",
-      character: { name: "Mia", role: "nowa koleżanka" },
       conceptId: w2["my-name-is"].id,
-      start: "hi",
-      nodes: {
-        hi: ["Hi! I'm Mia. What's your name?", [
-          ["My name is {name}.", "nice"],
-          ["Hi! I'm {name}.", "nice"],
-          ["Your name is Mia.", null, "Mia pyta o **Twoje** imię. Powiedz, jak masz na imię.", w2["my-name-is"].id],
-        ]],
-        nice: ["Nice to meet you, {name}!", [
-          ["Nice to meet you too!", "leo"],
-          ["What's your name?", null, "Już wiesz, że to Mia! Odpowiedz, że też miło Ci ją poznać.", w2["nice-to-meet-you"].id],
-        ]],
-        leo: ["This is Leo. He's my friend.", [
-          ["Hi, Leo!", "end"],
-          ["Hi, Mia!", null, "Mia przedstawia Ci Leo — przywitaj się z nim.", w1.hello.id],
-        ]],
-        end: ["Hi, {name}! Welcome to our class!"],
+      start: "name",
+      turns: {
+        name: {
+          who: "bell",
+          pose: "bell-smile",
+          line: "Hello! What's your name?",
+          pl: "Cześć! Jak masz na imię?",
+          answers: [
+            { says: ["my name is", "i am"], next: "nice" },
+            { says: ["*"], next: "nice", reply: "Oh, hello! You can also say: My name is {name}." },
+          ],
+          misses: [
+            { says: ["what is your name"], reply: "Ha! I asked first!", hint: "Najpierw Ty odpowiadasz: **My name is…** albo **I'm…**" },
+            { says: ["your name is"], reply: "No, no, your name!", hint: "Pani Bell pyta o **Twoje** imię: **My name is…**" },
+          ],
+          frame: "My name is ___.",
+          model: "My name is {name}.",
+          conceptId: w2["my-name-is"].id,
+        },
+        nice: {
+          who: "bell",
+          pose: "bell-happy",
+          line: "Nice to meet you, {name}!",
+          pl: "Miło cię poznać, {name}!",
+          answers: [{ says: ["nice to meet you"], next: "ask" }],
+          misses: [{ says: ["thank you"], reply: "Oh, thank you! And…?", hint: "Odpowiedz tym samym: **Nice to meet you too!**" }],
+          frame: "Nice to meet you ___!",
+          model: "Nice to meet you too!",
+          conceptId: w2["nice-to-meet-you"].id,
+        },
+        ask: {
+          who: "bell",
+          pose: "bell-idea",
+          line: "Now it's your turn. Ask me my name!",
+          pl: "Teraz twoja kolej. Zapytaj mnie, jak mam na imię!",
+          answers: [{ says: ["what is your name"], next: "mia", reply: "My name is Ms Bell. I'm your English teacher!" }],
+          misses: [{ says: ["my name is", "i am"], reply: "Yes, I know your name!", hint: "Teraz Ty pytasz: **What's your name?**" }],
+          frame: "What's ___ name?",
+          model: "What's your name?",
+          conceptId: w2["whats-your-name"].id,
+        },
+        mia: {
+          who: "bell",
+          pose: "bell-smile",
+          line: "And Mia? Is Mia a boy or a girl?",
+          pl: "A Mia? Mia to chłopiec czy dziewczynka?",
+          answers: [{ says: ["girl"], next: null, reply: "Woof!", replyBy: "mia" }],
+          misses: [{ says: ["boy"], reply: "A boy? Mia, is that true?", hint: "Przypomnij sobie historię: Leo powiedział **Mia is a girl**." }],
+          frame: "Mia is a ___.",
+          model: "Mia is a girl.",
+          conceptId: w2.girl.id,
+        },
       },
-      done: "Scenka zaliczona! Masz nową koleżankę.",
+      ending: "Great! Welcome to our class, {name}!",
+    }),
+    realTask("hw2.real", {
+      title: "Poznajmy się",
+      intro: "Zagraj z kimś z rodziny w poznawanie się. Udawajcie, że to wasze pierwsze spotkanie.",
+      steps: [
+        "Zapytaj kogoś z rodziny: **What's your name?**",
+        "Kiedy odpowie, powiedz: **Nice to meet you!**",
+        "Zamieńcie się: teraz ta osoba pyta, a Ty odpowiadasz **My name is…** albo **I'm…**",
+      ],
+      phrases: [
+        { en: "What's your name?", pl: "Jak masz na imię?" },
+        { en: "My name is…", pl: "Mam na imię…" },
+        { en: "I'm…", pl: "Jestem…" },
+        { en: "Nice to meet you!", pl: "Miło cię poznać!" },
+      ],
+      stamp: { id: "hw-name", label: "Nowa znajomość", icon: "passport" },
+      conceptId: w2["whats-your-name"].id,
     }),
   ],
 });

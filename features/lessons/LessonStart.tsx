@@ -7,10 +7,11 @@ import { useAge } from "@/features/theme/AgeScope";
 import { useAppStore } from "@/lib/store/app-store";
 import { cx, plural } from "@/lib/utils";
 import { LineIcon, type LineIconName } from "@/components/ui/LineIcon";
-import type { ExerciseType, Lesson } from "@/types";
+import type { ExerciseType, Lesson, StoryExercise } from "@/types";
+import { characterSrc } from "./mission/characters";
 import { childStepLabel, exerciseName, lessonSkills, lessonTypes, skillCode, skillName } from "./labels";
 import { lessonScene, withName } from "./scenes";
-import { SceneIllustration } from "./SceneIllustration";
+import { SceneBackdrop, SceneIllustration, sceneBackground } from "./SceneIllustration";
 import { useLessonContext } from "./useLessonContext";
 
 const CHIP_COLORS = ["bg-amber-soft", "bg-sky-soft", "bg-violet-soft", "bg-moss-soft"];
@@ -23,6 +24,9 @@ const TASK_ICON: Record<ExerciseType, LineIconName> = {
   SENTENCE_BUILDER: "task-sentence",
   SPEAKING: "task-speaking",
   DIALOGUE: "task-scene",
+  STORY: "task-story",
+  CONVERSATION: "task-speaking",
+  REAL_TASK: "task-real",
 };
 const TASK_TILE: Record<ExerciseType, string> = {
   MATCHING: "bg-moss-soft",
@@ -33,10 +37,38 @@ const TASK_TILE: Record<ExerciseType, string> = {
   SENTENCE_BUILDER: "bg-violet-soft",
   SPEAKING: "bg-coral-soft",
   DIALOGUE: "bg-amber-soft",
+  STORY: "bg-sky-soft",
+  CONVERSATION: "bg-coral-soft",
+  REAL_TASK: "bg-moss-soft",
 };
 
 /** Child-mode lesson art: the place of the lesson's scene, its character and their first line. */
+/** Story missions: the first picture of the story, with the characters' own art. */
+function StoryArt({ story, learnerName }: { story: StoryExercise; learnerName: string | null | undefined }) {
+  const panel = story.panels[0];
+  const first = panel.lines[0];
+  return (
+    <div className="relative min-h-[390px] overflow-hidden rounded-[40px_40px_12px_40px] lg:aspect-[5/4] lg:min-h-0" style={{ background: sceneBackground(panel.setting) }}>
+      <SceneBackdrop setting={panel.setting} />
+      <div className="absolute inset-x-[4%] bottom-0 flex h-full items-end justify-end gap-[2%]" aria-hidden>
+        {panel.cast.map((pose) => (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img key={pose} src={characterSrc(pose)} alt="" className="w-auto max-w-[46%] object-contain object-bottom" style={{ height: pose.startsWith("mia") ? "42%" : "84%" }} />
+        ))}
+      </div>
+      <span className="absolute left-[6%] top-[7%] rounded-full bg-card/90 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.1em] shadow-[0_2px_6px_oklch(0.23_0.025_265/0.12)]">{story.title}</span>
+      {first && (
+        <div className="absolute left-[6%] top-[19%] max-w-[50%] rounded-[18px_18px_18px_4px] bg-card px-4 py-3 font-display text-[17px] font-semibold leading-snug shadow-[0_8px_20px_oklch(0.23_0.025_265/0.15)]">
+          {withName(first.en, learnerName)}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function SceneArt({ lesson, learnerName }: { lesson: Lesson; learnerName: string | null | undefined }) {
+  const storyStep = lesson.exercises.find((e): e is StoryExercise => e.type === "STORY");
+  if (storyStep) return <StoryArt story={storyStep} learnerName={learnerName} />;
   const dialogue = lessonScene(lesson);
   const board = dialogue?.scene.board;
   const firstLine = dialogue ? withName(dialogue.script.nodes[dialogue.script.startNodeId].line, learnerName) : null;

@@ -10,6 +10,9 @@ const TYPE_NAMES: Record<AgeGroup, Record<ExerciseType, string>> = {
     SPEAKING: "Mówienie",
     DIALOGUE: "Scenka",
     MULTIPLE_CHOICE: "Quiz",
+    STORY: "Historia",
+    CONVERSATION: "Rozmowa",
+    REAL_TASK: "Misja w realu",
   },
   TEEN: {
     MATCHING: "Match the words",
@@ -20,6 +23,9 @@ const TYPE_NAMES: Record<AgeGroup, Record<ExerciseType, string>> = {
     SPEAKING: "Say it out loud",
     DIALOGUE: "Live scenario",
     MULTIPLE_CHOICE: "Speed round",
+    STORY: "Story",
+    CONVERSATION: "Talk",
+    REAL_TASK: "Real-life mission",
   },
   ADULT: {
     MATCHING: "Vocabulary",
@@ -30,6 +36,9 @@ const TYPE_NAMES: Record<AgeGroup, Record<ExerciseType, string>> = {
     SPEAKING: "Speaking",
     DIALOGUE: "Real-world scenario",
     MULTIPLE_CHOICE: "Quick check",
+    STORY: "Story",
+    CONVERSATION: "Conversation",
+    REAL_TASK: "Real-life task",
   },
 };
 

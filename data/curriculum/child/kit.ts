@@ -1,6 +1,10 @@
 import type {
   ChoiceOption,
   Concept,
+  ConversationExercise,
+  RealTaskExercise,
+  StoryExercise,
+  StoryPanel,
   DialogueExercise,
   DialogueNode,
   FillGapExercise,
@@ -335,4 +339,50 @@ export function lesson(spec: {
 
 function capitalise(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+/* ---------- the mission format: story → conversation → real-life task ---------- */
+
+export function story(id: string, spec: { title: string; panels: StoryPanel[]; conceptId: string }): StoryExercise {
+  return {
+    id,
+    type: "STORY",
+    skill: "LISTENING",
+    xp: 10,
+    conceptId: spec.conceptId,
+    title: spec.title,
+    panels: spec.panels,
+    feedback: { correct: { title: "Historia obejrzana!" }, incorrect: { title: "" } },
+  };
+}
+
+export function conversation(
+  id: string,
+  spec: { title: string; goal: string; setting: SceneSetting; start: string; turns: ConversationExercise["turns"]; ending: string; conceptId: string },
+): ConversationExercise {
+  return {
+    id,
+    type: "CONVERSATION",
+    skill: "SPEAKING",
+    xp: 40,
+    conceptId: spec.conceptId,
+    title: spec.title,
+    goal: spec.goal,
+    setting: spec.setting,
+    start: spec.start,
+    turns: spec.turns,
+    ending: spec.ending,
+    feedback: { correct: { title: "Udało się porozumieć po angielsku!" }, incorrect: { title: "Spróbuj jeszcze raz." } },
+  };
+}
+
+export function realTask(id: string, spec: Omit<RealTaskExercise, "id" | "type" | "skill" | "xp" | "conceptId" | "feedback"> & { conceptId: string }): RealTaskExercise {
+  return {
+    id,
+    type: "REAL_TASK",
+    skill: "SPEAKING",
+    xp: 20,
+    ...spec,
+    feedback: { correct: { title: "Misja zapisana!" }, incorrect: { title: "" } },
+  };
 }

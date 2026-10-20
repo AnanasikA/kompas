@@ -77,7 +77,7 @@ const PROPS: Record<SceneSetting, readonly (readonly [LineIconName, number, numb
   ],
 };
 
-function Backdrop({ setting, flip }: { setting: SceneSetting; flip?: boolean }) {
+export function SceneBackdrop({ setting, flip }: { setting: SceneSetting; flip?: boolean }) {
   const { back, ground, line } = SKY[setting];
   const outdoors = setting === "park";
   return (
@@ -147,7 +147,7 @@ export function SceneIllustration({
   const look = character ? characterLook(character) : undefined;
   return (
     <div className={className} style={{ position: "relative", overflow: "hidden", background: SKY[setting].back }}>
-      <Backdrop setting={setting} flip={flip} />
+      <SceneBackdrop setting={setting} flip={flip} />
       {look && (
         // Big portrait of the character, standing at the bottom edge on the right.
         <div aria-hidden className={`absolute bottom-0 flex max-h-[300px] items-end ${figureClassName}`}>

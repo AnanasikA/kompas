@@ -16,4 +16,6 @@ export interface ExerciseViewProps<E extends Exercise = Exercise> {
   showXp: boolean;
   /** Label for the continue button on the last step. */
   continueLabel?: string;
+  /** The lesson the exercise belongs to (lessons only; practice has none). */
+  lessonId?: string;
 }

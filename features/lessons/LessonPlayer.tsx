@@ -184,6 +184,7 @@ export function LessonPlayer({ lessonId }: { lessonId: string }) {
           <ExerciseRenderer
             key={`${exercise.id}:${progress.startedAt}`}
             exercise={exercise}
+            lessonId={lessonId}
             showXp
             continueLabel={isLast ? skin.t.finish : undefined}
             onMistake={(conceptIds) => lessonMistake(lessonId, conceptIds)}

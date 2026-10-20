@@ -64,6 +64,10 @@ interface Actions {
   lessonTick(lessonId: string, seconds: number): void;
   finishLesson(lessonId: string): void;
   noteSpeakingAttempt(): void;
+  /** Real-life missions: tick a step, say it is done, or (parent) confirm it. */
+  tickRealTask(taskId: string, lessonId: string, step: number): void;
+  finishRealTask(taskId: string, lessonId: string): void;
+  confirmRealTask(taskId: string): void;
   clearReward(): void;
 
   /* practice */
@@ -139,6 +143,7 @@ function snapshot(store: AppStore): AppState {
     wordStats: store.wordStats,
     round: store.round,
     pendingReward: store.pendingReward,
+    ...(store.realTasks && { realTasks: store.realTasks }),
     ...(store.demoEdition !== undefined && { demoEdition: store.demoEdition }),
   };
 }
@@ -328,6 +333,27 @@ export const useAppStore = create<AppStore>()((set, get) => ({
     });
   },
 
+  tickRealTask(taskId, lessonId, step) {
+    const tasks = get().realTasks ?? {};
+    const record = tasks[taskId] ?? { lessonId, ticked: [] };
+    const ticked = record.ticked.includes(step) ? record.ticked.filter((s) => s !== step) : [...record.ticked, step].sort();
+    set({ realTasks: { ...tasks, [taskId]: { ...record, ticked } } });
+  },
+
+  finishRealTask(taskId, lessonId) {
+    const tasks = get().realTasks ?? {};
+    const record = tasks[taskId] ?? { lessonId, ticked: [] };
+    if (record.doneAt) return;
+    set({ realTasks: { ...tasks, [taskId]: { ...record, doneAt: new Date().toISOString() } } });
+  },
+
+  confirmRealTask(taskId) {
+    const tasks = get().realTasks ?? {};
+    const record = tasks[taskId];
+    if (!record || record.confirmedAt) return;
+    set({ realTasks: { ...tasks, [taskId]: { ...record, doneAt: record.doneAt ?? new Date().toISOString(), confirmedAt: new Date().toISOString() } } });
+  },
+
   noteSpeakingAttempt() {
     const state = get();
     set({ activity: bumpActivity(state.activity, new Date(), { speakingAttempts: 1 }) });
@@ -434,6 +460,7 @@ export const useAppStore = create<AppStore>()((set, get) => ({
       wordStats: {},
       round: null,
       pendingReward: null,
+      realTasks: {},
       user: { ...state.user, xp: 0, level: 1, streak: 0 },
     });
   },

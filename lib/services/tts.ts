@@ -13,7 +13,7 @@ import type { AudioSource } from "@/types";
 export interface TtsEngine {
   isSupported(): boolean;
   /** Resolves when speech ends, rejects on error. */
-  speak(text: string, opts: { lang?: string; rate?: number }): Promise<void>;
+  speak(text: string, opts: { lang?: string; rate?: number; pitch?: number }): Promise<void>;
   cancel(): void;
 }
 
@@ -28,7 +28,7 @@ export class BrowserTtsEngine implements TtsEngine {
     return typeof window !== "undefined" && "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
   }
 
-  speak(text: string, opts: { lang?: string; rate?: number }): Promise<void> {
+  speak(text: string, opts: { lang?: string; rate?: number; pitch?: number }): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this.isSupported()) {
         reject(new Error("tts-unsupported"));
@@ -40,6 +40,7 @@ export class BrowserTtsEngine implements TtsEngine {
       const lang = opts.lang ?? "en-GB";
       utterance.lang = lang;
       utterance.rate = opts.rate ?? 0.9;
+      utterance.pitch = opts.pitch ?? 1;
       const voice = synth.getVoices().find((v) => v.lang === lang) ?? synth.getVoices().find((v) => v.lang.startsWith("en"));
       if (voice) utterance.voice = voice;
       // Some browsers never fire `onend` (e.g. no voice installed). Don't leave the UI "playing" forever.
@@ -90,7 +91,7 @@ export function createAudioPlayer(tts: TtsEngine): AudioPlayer {
           audio.play().catch(reject);
         });
       }
-      return tts.speak(source.text, { lang: source.lang, rate: source.rate });
+      return tts.speak(source.text, { lang: source.lang, rate: source.rate, pitch: source.pitch });
     },
     stop() {
       stopFile();

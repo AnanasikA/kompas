@@ -14,7 +14,7 @@ const POSTCARD_TILT = ["-rotate-2", "rotate-[1.5deg]", "-rotate-1", "rotate-2"];
 
 export function ChildHome() {
   const data = useLearner();
-  const { user, level, rank, streak, goal, next, current, currentLevel, levels, due, last, week, units, activity, now, course } = data;
+  const { user, level, rank, streak, goal, next, current, currentLevel, levels, due, last, week, activity, now, course } = data;
   const unit = next?.unit ?? current;
   const lesson = next?.lesson;
   const inProgress = lesson?.status === "IN_PROGRESS";
@@ -23,7 +23,6 @@ export function ChildHome() {
   const missionsDone = missions.filter((m) => m.complete).length;
   const weak = due.filter((r) => r.status === "weak").length;
   const levelTitle = unit ? course.levels.find((l) => l.level === unit.unit.level)?.title : undefined;
-  const completedUnits = units.filter((u) => u.status === "COMPLETED");
   // Postcards: every world collected so far, the one in progress and the next one ahead.
   const placed = levels.flatMap((l, levelIndex) => l.units.map((state, indexInLevel) => ({ state, levelIndex, indexInLevel })));
   const currentAt = placed.findIndex((p) => p.state.unit.id === unit?.unit.id);
@@ -243,8 +242,8 @@ export function ChildHome() {
         <section className="flex flex-col gap-4 rounded-[28px] bg-sand p-[22px]">
           <div className="flex items-baseline justify-between">
             <h2 className="m-0 font-display text-[22px] font-extrabold">Moje pocztówki</h2>
-            <Link href="/journey" className="k-tap rounded text-sm font-semibold">
-              Kolekcja · {completedUnits.length}/{units.length} →
+            <Link href="/passport" className="k-tap rounded text-sm font-semibold">
+              Paszport odkrywcy →
             </Link>
           </div>
           <ul className="m-0 flex list-none gap-4 overflow-x-auto px-1 pb-3 pt-2">

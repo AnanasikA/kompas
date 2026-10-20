@@ -1,6 +1,9 @@
 "use client";
 
 import { ChoiceExercise } from "./ChoiceExercise";
+import { ConversationExercise } from "./ConversationExercise";
+import { RealTaskExercise } from "./RealTaskExercise";
+import { StoryExercise } from "./StoryExercise";
 import { DialogueExercise } from "./DialogueExercise";
 import { MatchingExercise } from "./MatchingExercise";
 import { SentenceBuilderExercise } from "./SentenceBuilderExercise";
@@ -27,5 +30,11 @@ export function ExerciseRenderer(props: ExerciseViewProps) {
       return <SpeakingExercise exercise={exercise} {...rest} />;
     case "DIALOGUE":
       return <DialogueExercise exercise={exercise} {...rest} />;
+    case "STORY":
+      return <StoryExercise exercise={exercise} {...rest} />;
+    case "CONVERSATION":
+      return <ConversationExercise exercise={exercise} {...rest} />;
+    case "REAL_TASK":
+      return <RealTaskExercise exercise={exercise} {...rest} />;
   }
 }

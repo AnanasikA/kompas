@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { totals } from "@/features/gamification/activity";
+import { realTasksOf } from "@/features/lessons/mission/realTasks";
+import { useAppStore } from "@/lib/store/app-store";
 import { nextReviewLabel } from "@/features/practice/review";
 import { useLearner } from "@/features/progress/useLearner";
 import { cx, formatDuration } from "@/lib/utils";
@@ -20,6 +22,9 @@ export function ParentPanel() {
   const avg = done.length ? Math.round(done.reduce((s, d) => s + (d.progress.best?.accuracy ?? 0), 0) / done.length) : null;
   const max = Math.max(user.dailyGoal, ...week.map((d) => d.minutes));
   const toReview = reviews.filter((r) => r.status !== "mastered");
+  const records = useAppStore((s) => s.realTasks);
+  const confirm = useAppStore((s) => s.confirmRealTask);
+  const missions = realTasksOf(course, records).filter((m) => m.state !== "ahead");
 
   return (
     <div data-age="ADULT" className="min-h-dvh bg-canvas text-ink">
@@ -54,6 +59,37 @@ export function ParentPanel() {
             </div>
           ))}
         </dl>
+
+        <section className="flex flex-col gap-3 rounded-[24px] bg-canvas-card p-[22px] shadow-[inset_0_0_0_1px_var(--color-canvas-line)]">
+          <div className="flex flex-col gap-1">
+            <h2 className="m-0 font-display text-[22px] font-extrabold">Misje w realu</h2>
+            <p className="m-0 text-[14px] text-muted">Zadania poza ekranem: dziecko używa angielskiego w domu. Potwierdź, kiedy dziecko naprawdę wykona zadanie — dostanie wtedy pieczątkę do paszportu odkrywcy.</p>
+          </div>
+          {missions.length === 0 ? (
+            <p className="m-0 text-[15px] text-muted">Jeszcze żadnej. Pierwsza pojawi się po misji „Hello!”.</p>
+          ) : (
+            <ul className="m-0 flex list-none flex-col p-0">
+              {missions.map(({ task, lesson, record, state }) => (
+                <li key={task.id} className="grid grid-cols-1 gap-3 border-t border-canvas-line-soft py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+                  <span className="flex flex-col gap-1">
+                    <b>{task.title}</b>
+                    <span className="text-[13px] text-muted">
+                      {lesson.title} · {state === "waiting" ? "dziecko zgłosiło wykonanie" : state === "stamped" ? "potwierdzone" : "w trakcie"} · kroki: {record?.ticked.length ?? 0} z {task.steps.length}
+                    </span>
+                    <span className="text-[13px]">{task.steps.map((step) => step.replace(/\*\*/g, "")).join(" · ")}</span>
+                  </span>
+                  {state === "stamped" ? (
+                    <span className="font-mono text-xs text-moss-ink">✓ potwierdzone · pieczątka „{task.stamp.label}”</span>
+                  ) : (
+                    <button type="button" onClick={() => confirm(task.id)} className="rounded-xl bg-violet-deep px-4 py-2.5 text-sm font-semibold text-white">
+                      Potwierdzam, zrobione
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <section className="flex flex-col gap-4 rounded-[24px] bg-canvas-card p-[22px] shadow-[inset_0_0_0_1px_var(--color-canvas-line)]">

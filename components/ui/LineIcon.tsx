@@ -82,6 +82,10 @@ import {
   Cards,
   Microphone,
   ChatsCircle,
+  BookOpenText,
+  Footprints,
+  Stamp,
+  IdentificationCard,
 } from "@phosphor-icons/react/dist/ssr";
 import type { Icon } from "@phosphor-icons/react";
 
@@ -397,6 +401,10 @@ const ICONS = {
   "task-sentence": [Cards, COLOR.violet],
   "task-speaking": [Microphone, COLOR.red],
   "task-scene": [ChatsCircle, COLOR.orange],
+  "task-story": [BookOpenText, COLOR.sky],
+  "task-real": [Footprints, COLOR.green],
+  stamp: [Stamp, COLOR.red],
+  passport: [IdentificationCard, COLOR.blue],
   // sea
   ship: [Sailboat, COLOR.brown],
   boat: [Boat, COLOR.brown],

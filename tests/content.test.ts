@@ -4,6 +4,7 @@ import { childCourse } from "@/data/curriculum/child";
 import { helloWorld } from "@/data/curriculum/child/pre-a1/hello-world";
 import { home } from "@/data/curriculum/child/pre-a1/home";
 import { longestPath } from "@/features/learning/dialogue/engine";
+import { judgeTurn } from "@/features/learning/engine/conversation";
 import { isLineIcon } from "@/components/ui/LineIcon";
 import { isPlayable, type Course, type Exercise, type Lesson } from "@/types";
 
@@ -24,6 +25,7 @@ function conceptIds(e: Exercise): string[] {
   if ("options" in e && Array.isArray(e.options)) ids.push(...e.options.flatMap((o) => (o.conceptId ? [o.conceptId] : [])));
   if (e.type === "MATCHING") ids.push(...e.pairs.map((p) => p.id));
   if (e.type === "DIALOGUE") ids.push(...Object.values(e.script.nodes).flatMap((n) => n.options.flatMap((o) => (o.conceptId ? [o.conceptId] : []))));
+  if (e.type === "CONVERSATION") ids.push(...Object.values(e.turns).map((t) => t.conceptId));
   return ids;
 }
 
@@ -69,6 +71,30 @@ function problems(e: Exercise): string[] {
     }
     case "SPEAKING":
       if (!e.target.trim()) found.push("nothing to say");
+      break;
+    case "STORY":
+      if (!e.panels.length) found.push("a story needs pictures");
+      for (const p of e.panels) if (!p.lines.length || p.lines.some((l) => !l.en.trim() || !l.pl.trim())) found.push(`${p.id}: every line needs English and Polish`);
+      break;
+    case "CONVERSATION": {
+      if (!e.turns[e.start]) found.push("the first turn is missing");
+      let ends = false;
+      for (const [id, turn] of Object.entries(e.turns)) {
+        for (const a of turn.answers) {
+          if (a.next && !e.turns[a.next]) found.push(`${id} → ${a.next} does not exist`);
+          if (!a.next) ends = true;
+        }
+        // The example answer shown to the learner must be accepted, and not caught as a mistake.
+        const model = judgeTurn(turn, [turn.model.replaceAll("{name}", "Ola")]);
+        if (model.kind !== "answer" || model.answer.says.includes("*")) found.push(`${id}: the example answer "${turn.model}" is not accepted`);
+        // The sentence starter must lead to an accepted answer.
+        if (!turn.frame.includes("___")) found.push(`${id}: the sentence starter needs a ___ gap`);
+      }
+      if (!ends) found.push("the conversation never ends");
+      break;
+    }
+    case "REAL_TASK":
+      if (!e.steps.length || !e.phrases.length) found.push("a real-life mission needs steps and phrases");
       break;
   }
   return found;
@@ -126,10 +152,15 @@ describe.each([
     expect(terms.filter((t, i) => terms.indexOf(t) !== i)).toEqual([]);
   });
 
-  it("every mission practises vocabulary, listening, building, speaking and a scene", () => {
+  it("every mission is either a story mission or a full practice mission", () => {
     for (const lesson of steps.filter(isPlayable).slice(0, 10)) {
-      const types = new Set(lesson.exercises.map((e) => e.type));
-      for (const type of ["MATCHING", "LISTENING", "SENTENCE_BUILDER", "SPEAKING", "DIALOGUE"] as const) expect(types.has(type), `${lesson.title}: ${type}`).toBe(true);
+      const types = lesson.exercises.map((e) => e.type);
+      if (types.includes("STORY")) {
+        // New format: watch the story, talk, then do it for real.
+        expect(types, lesson.title).toEqual(["STORY", "CONVERSATION", "REAL_TASK"]);
+      } else {
+        for (const type of ["MATCHING", "LISTENING", "SENTENCE_BUILDER", "SPEAKING", "DIALOGUE"] as const) expect(types.includes(type), `${lesson.title}: ${type}`).toBe(true);
+      }
     }
   });
 
